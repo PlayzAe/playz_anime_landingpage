@@ -63,7 +63,7 @@ function DocsHome() {
         {sectionsWithPages().map((s) => (
           <Link key={s.name} to={s.name === 'Policies' ? '/docs/policies' : s.pages[0].path} className="docs-card">
             <span className="docs-card-title">{s.name}</span>
-            <span className="docs-card-pages">{s.pages.map((p) => p.title).join(' · ')}</span>
+            <span className="docs-card-pages">{s.pages.map((p) => p.title).join(' • ')}</span>
           </Link>
         ))}
       </div>
