@@ -79,6 +79,7 @@ Visit the live landing page:
 
 ### 1. Install dependencies
 ```bash
+<<<<<<< HEAD
 npm install
 ```
 
@@ -89,6 +90,16 @@ npm run dev
 # or on Windows
 start.bat
 ```
+=======
+start.bat            # live reload on http://localhost:5320
+start.bat built      # the production build on http://localhost:5321
+npm run shots        # screenshots of the built site (desktop and phone) into shots/
+npm run images       # remake the WebP copies after changing public/screenshots/*.png
+```
+- **Links:** every Download, Web app and GitHub link comes from `src/lib/links.ts`.
+- **Docs:** Markdown in `content/docs/`. The policies (Terms of Service, Copyright & DMCA, Disclaimer, Privacy)
+  are in `content/docs/policies/`.
+>>>>>>> b2c8390969c3419277e26dd40b311dfbe0549315
 
 ### 3. Production build
 ```bash
