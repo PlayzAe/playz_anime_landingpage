@@ -6,3 +6,4 @@ research/
 *.log
 .env
 .env.*
+PROFILE_README.md
