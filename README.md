@@ -41,6 +41,10 @@ This repository powers the official **landing page, product showcase, knowledge 
 
 Built with **React 19**, **Motion**, and **Vite**, it compiles to a blazing-fast 100% static site deployed globally via **GitHub Pages**.
 
+> [!NOTE]
+> **Mobile & Android Display Notice:**
+> The web streaming app is best viewed on **laptops, TVs, or desktop monitors**. Mobile browser viewing for Android and smartphones is currently unoptimized and scattered. A dedicated native **Android app is coming soon**!
+
 ---
 
 ## Features

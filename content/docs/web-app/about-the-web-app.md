@@ -12,6 +12,11 @@ The web edition of PlayzAnime runs directly in modern browsers on desktop, table
 - **Official Web App URL:** [playz-anime.onrender.com](https://playz-anime.onrender.com)
 - **Status:** 24/7 Cloud Hosted (Render)
 
+> [!IMPORTANT]
+> **Device & Display Notice:**
+> The web streaming interface is optimized specifically for **laptops, desktop monitors, and TVs**.
+> Mobile and Android browser support is currently unoptimized — layouts, video controls, and reader views may appear scattered on small phone screens. A dedicated **native Android app is coming soon** with hardware-accelerated playback and offline downloads.
+
 ---
 
 ## Features on the web
