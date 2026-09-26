@@ -38,7 +38,7 @@ export function Docs() {
               <ul>
                 {s.pages.map((p) => (
                   <li key={p.path}>
-                    <Link to={p.path} className={p.path === path ? 'is-current' : undefined} aria-current={p.path === path ? 'page' : undefined}>
+                    <Link to={p.path} className={(page ? page.path : path) === p.path ? 'is-current' : undefined} aria-current={(page ? page.path : path) === p.path ? 'page' : undefined}>
                       {p.title}
                     </Link>
                   </li>

@@ -9,6 +9,14 @@ order: 2
 
 *Last updated: September 26, 2026*
 
+> [!IMPORTANT]
+> **Web streaming availability and domain notice:**
+> The public web streaming instance has a high tendency to go down, face upstream blocks, or get taken down quickly. Domain changes for both the streaming website and landing page are coming soon.
+> 
+> To guarantee continuous, uninterrupted access:
+> - **Bookmark the landing page and GitHub:** Keep [playzae.github.io/playz_anime_landingpage](https://playzae.github.io/playz_anime_landingpage/) and the [PlayzAe GitHub](https://github.com/PlayzAe) bookmarked for active mirrors and domain announcements.
+> - **Download the Windows Desktop App:** The desktop app runs locally on your machine, streams directly, supports true offline downloads, and will never go down. Always check [PlayzAe/playz_anime_desktopapp](https://github.com/PlayzAe/playz_anime_desktopapp) for desktop updates and releases.
+
 PlayzAnime respects the rights of creators and publishers, and we act on valid copyright notices quickly.
 
 PlayzAnime doesn't host video, images or manga pages. It shows content that third-party websites already publish, and the web app's server only forwards requests to them as they happen, keeping nothing. That means **the content itself stays on those sources**. For it to come down, send a notice to the website that hosts it too.

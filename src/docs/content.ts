@@ -73,8 +73,18 @@ export function sectionsWithPages(): { name: string; slug: string; pages: DocPag
   return out;
 }
 
+const DOC_ALIASES: Record<string, string> = {
+  '/docs/policies/dmca': '/docs/policies/copyright-and-dmca',
+  '/docs/dmca': '/docs/policies/copyright-and-dmca',
+  '/dmca': '/docs/policies/copyright-and-dmca',
+  '/docs/policies/copyright': '/docs/policies/copyright-and-dmca',
+  '/docs/copyright': '/docs/policies/copyright-and-dmca',
+};
+
 export function findPage(path: string): DocPage | undefined {
-  return PAGES.find((p) => p.path === path.replace(/\/+$/, ''));
+  const clean = path.replace(/\/+$/, '');
+  const target = DOC_ALIASES[clean] || clean;
+  return PAGES.find((p) => p.path === target);
 }
 
 // ── Rendering ───────────────────────────────────────────────────────────────

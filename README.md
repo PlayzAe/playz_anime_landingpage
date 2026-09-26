@@ -30,7 +30,7 @@
 </div>
 
 <h5 align="center">
-Leave a star if you like the project! ⭐️
+Leave a star if you like the project.
 </h5>
 
 <br>
@@ -79,7 +79,6 @@ Visit the live landing page:
 
 ### 1. Install dependencies
 ```bash
-<<<<<<< HEAD
 npm install
 ```
 
@@ -87,19 +86,16 @@ npm install
 ```bash
 # Start live reload server on http://localhost:5320
 npm run dev
+
 # or on Windows
-start.bat
-```
-=======
 start.bat            # live reload on http://localhost:5320
-start.bat built      # the production build on http://localhost:5321
-npm run shots        # screenshots of the built site (desktop and phone) into shots/
-npm run images       # remake the WebP copies after changing public/screenshots/*.png
+start.bat built      # production build on http://localhost:5321
+npm run shots        # screenshots into shots/
+npm run images       # optimize WebP copies in public/screenshots/
 ```
+
 - **Links:** every Download, Web app and GitHub link comes from `src/lib/links.ts`.
-- **Docs:** Markdown in `content/docs/`. The policies (Terms of Service, Copyright & DMCA, Disclaimer, Privacy)
-  are in `content/docs/policies/`.
->>>>>>> b2c8390969c3419277e26dd40b311dfbe0549315
+- **Docs:** Markdown in `content/docs/`. Policies (Terms of Service, Copyright & DMCA, Disclaimer, Privacy) are in `content/docs/policies/`.
 
 ### 3. Production build
 ```bash
@@ -122,16 +118,21 @@ npm run images   # optimizes and remakes WebP copies in public/screenshots/
 
 ## Links Configuration
 
-All product links (Web App, Downloads, GitHub) are centralized in:
-👉 [`src/lib/links.ts`](src/lib/links.ts)
+All product links (Web App, Downloads, GitHub) are centralized in [`src/lib/links.ts`](src/lib/links.ts):
 
 ```ts
 export const GITHUB_URL = 'https://github.com/PlayzAe';
-export const DOWNLOAD_URL = GITHUB_URL;
+export const DOWNLOAD_URL = 'https://github.com/PlayzAe/playz_anime_desktopapp/releases/tag/Playz_Anime';
 export const WEB_APP_URL = 'https://playz-anime.onrender.com';
 ```
 
 <br>
 
-> [!NOTE]
-> For copyright requests and DMCA notices, refer to [playzae.github.io/playz_anime_landingpage/docs/policies/dmca](https://playzae.github.io/playz_anime_landingpage/docs/policies/dmca).
+> [!IMPORTANT]
+> The public web streaming instance has a high tendency to go down, face upstream blocks, or get taken down quickly. Domain changes for both the streaming website and landing page are coming soon.
+> 
+> To guarantee continuous, uninterrupted access:
+> - **Bookmark the landing page and GitHub:** Keep [playzae.github.io/playz_anime_landingpage](https://playzae.github.io/playz_anime_landingpage/) bookmarked for active mirrors.
+> - **Download the Windows Desktop App:** The desktop app runs locally, streams directly, supports true offline downloads, and will never go down.
+> 
+> For copyright requests and DMCA notices, refer to [playzae.github.io/playz_anime_landingpage/docs/policies/copyright-and-dmca](https://playzae.github.io/playz_anime_landingpage/docs/policies/copyright-and-dmca) (or `/docs/policies/dmca`).
