@@ -11,7 +11,10 @@ export function href(path: string): string {
   if (/^[a-z]+:|^\/\//i.test(path)) return path;
   if (path.startsWith('#')) return path;
   const clean = path.startsWith('/') ? path : `/${path}`;
-  return `${BASE}${clean}`;
+  // Pages are prerendered as folders (docs/changelog/index.html), so their addresses end in a slash.
+  const [, p, rest] = /^([^?#]*)(.*)$/.exec(clean)!;
+  const slashed = p.endsWith('/') || /\.[a-z0-9]{2,5}$/i.test(p) ? p : `${p}/`;
+  return `${BASE}${slashed}${rest}`;
 }
 
 /** A URL for a file in /public, respecting the base path. */
@@ -19,7 +22,9 @@ export function asset(path: string): string {
   return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 }
 
-function readLocation() {
+/** Where we are. During prerendering there's no window, so the page being rendered is passed in. */
+function readLocation(initialPath?: string) {
+  if (typeof window === 'undefined') return { path: initialPath ?? '/', hash: '' };
   let path = decodeURI(window.location.pathname);
   if (BASE && (path === BASE || path.startsWith(`${BASE}/`))) path = path.slice(BASE.length);
   path = path.replace(/\/index\.html$/, '/').replace(/\/+$/, '') || '/';
@@ -43,8 +48,8 @@ function scrollToHash(hash: string, smooth: boolean) {
   return true;
 }
 
-export function RouterProvider({ children }: { children: ReactNode }) {
-  const [loc, setLoc] = useState(readLocation);
+export function RouterProvider({ children, initialPath }: { children: ReactNode; initialPath?: string }) {
+  const [loc, setLoc] = useState(() => readLocation(initialPath));
 
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';

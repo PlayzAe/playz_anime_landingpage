@@ -1,10 +1,15 @@
 # Publishes the site to GitHub Pages on every push to main. See DEPLOY.md.
+# The changelog comes from the desktop app's GitHub Releases: publish a release there and the
+# site shows it right away (visitors' browsers ask GitHub), and the daily rebuild below gives
+# it its own prerendered page for search engines. Run the workflow by hand to do that sooner.
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * *'
 
 permissions:
   contents: read
@@ -28,6 +33,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          # Only raises the GitHub API rate limit for reading the public release notes.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+          BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
           # A project site lives at https://<user>.github.io/<repo>/. With a custom domain, set the variable BASE_PATH to /.
           BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
           # Used for the link-preview image, e.g. https://<user>.github.io or https://your-domain.com

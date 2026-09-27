@@ -7,3 +7,7 @@ research/
 .env
 .env.*
 PROFILE_README.md
+
+# Build output: fetched release notes and the prerender server bundle
+src/generated/
+.ssr/

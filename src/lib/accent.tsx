@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export type AccentKey = 'shu' | 'yamabuki' | 'matcha' | 'ai' | 'sakura';
 
@@ -21,8 +21,8 @@ export const ACCENTS: Accent[] = [
 
 const STORAGE_KEY = 'playzanime-site:accent';
 
-function initialAccent(): AccentKey {
-  const fromDom = document.documentElement.getAttribute('data-accent');
+function savedAccent(): AccentKey {
+  const fromDom = typeof document === 'undefined' ? null : document.documentElement.getAttribute('data-accent');
   return ACCENTS.find((a) => a.key === fromDom)?.key ?? 'shu';
 }
 
@@ -43,8 +43,11 @@ interface AccentState {
 const AccentContext = createContext<AccentState | null>(null);
 
 export function AccentProvider({ children }: { children: ReactNode }) {
-  const [accent, setState] = useState<AccentKey>(initialAccent);
+  // Pages are prerendered with the default ink; the saved one (already applied to <html> by the
+  // inline script in index.html) takes over right after hydration, so the markup always matches.
+  const [accent, setState] = useState<AccentKey>('shu');
   const [wash, setWash] = useState<Wash | null>(null);
+  useEffect(() => setState(savedAccent()), []);
 
   const setAccent = useCallback((key: AccentKey, from?: { x: number; y: number }) => {
     setState(key);

@@ -3,17 +3,22 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/site.css';
 import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import { App } from './App';
 import { AccentProvider } from './lib/accent';
 import { RouterProvider } from './lib/router';
 
-createRoot(document.getElementById('root')!).render(
+const root = document.getElementById('root')!;
+const app = (
   <StrictMode>
     <AccentProvider>
       <RouterProvider>
         <App />
       </RouterProvider>
     </AccentProvider>
-  </StrictMode>,
+  </StrictMode>
 );
+
+// Built pages arrive already rendered (scripts/prerender.mjs); the dev server and 404.html don't.
+if (root.hasChildNodes()) hydrateRoot(root, app);
+else createRoot(root).render(app);

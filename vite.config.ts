@@ -17,7 +17,9 @@ function normaliseBase(raw: string | undefined): string {
 }
 
 const base = normaliseBase(process.env.BASE_PATH);
-const siteUrl = (process.env.SITE_URL ?? '').replace(/\/+$/, '');
+const siteUrl = (
+  process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '')
+).replace(/\/+$/, '');
 
 function socialMeta(): Plugin {
   return {
@@ -28,12 +30,14 @@ function socialMeta(): Plugin {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   base,
   plugins: [react(), socialMeta()],
   build: {
     target: 'es2022',
     assetsInlineLimit: 0,
+    // The server build only renders pages at build time; it needs no copy of /public.
+    copyPublicDir: !isSsrBuild,
     chunkSizeWarningLimit: 700,
   },
   server: {
@@ -43,4 +47,4 @@ export default defineConfig({
   preview: {
     port: 5321,
   },
-});
+}));

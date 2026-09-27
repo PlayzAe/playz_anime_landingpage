@@ -6,11 +6,12 @@ import { Frame, Shot, type ShotName } from '../components/Shot';
 import { DOWNLOAD_URL, GITHUB_URL, WEB_APP_URL } from '../lib/links';
 import { Link } from '../lib/router';
 import { EASE, Reveal, Vertical } from './bits';
+import { FAQ, faqParts } from './faq';
 import './landing.css';
 
 export function Landing() {
   useEffect(() => {
-    document.title = 'PlayzAnime: watch anime, read manga, keep both';
+    document.title = 'PlayzAnime: free anime & manga app for Windows, open source';
   }, []);
   return (
     <>
@@ -292,41 +293,6 @@ function PlatformCard({ icon, name, lede, items, cta }: { icon: IconName; name: 
   );
 }
 
-const FAQ: { q: string; a: ReactNode }[] = [
-  { q: 'Is PlayzAnime free?', a: 'Yes. No ads, no subscription, no premium tier. It is open source.' },
-  {
-    q: 'Does PlayzAnime host anime or manga?',
-    a: (
-      <>
-        No. It shows content that third-party websites already publish, and metadata comes from AniList. PlayzAnime doesn't host, upload or sell any of it. See the{' '}
-        <Link to="/docs/policies/disclaimer">disclaimer</Link>.
-      </>
-    ),
-  },
-  { q: 'Do I need an account?', a: 'No. There are no accounts. Your lists, history and profile stay on your device or in your browser.' },
-  { q: 'Can I download episodes on the web?', a: 'Downloads and offline mode are in the Windows app. The web app streams and reads, and shows you where to get the app when you want to keep something.' },
-  {
-    q: 'Windows says "Windows protected your PC". Is it safe?',
-    a: 'That warning appears for apps without a paid code-signing certificate. Click More info, then Run anyway. The source code is public if you want to check it or build it yourself.',
-  },
-  {
-    q: 'A title has no chapters or won’t play. What now?',
-    a: (
-      <>
-        Sources come and go. Try another source from the chapter list, or the embed player for episodes. The <Link to="/docs">docs</Link> have a troubleshooting section.
-      </>
-    ),
-  },
-  {
-    q: 'I own content that appears in PlayzAnime.',
-    a: (
-      <>
-        Send a notice as described in <Link to="/docs/policies/copyright-and-dmca">Copyright & DMCA</Link>. We act on valid notices within 72 hours.
-      </>
-    ),
-  },
-];
-
 function Faq() {
   return (
     <section id="faq" className="faq page" aria-labelledby="faq-title">
@@ -342,7 +308,7 @@ function Faq() {
               {f.q}
               <Icon name="plus" size={18} />
             </summary>
-            <div className="faq-answer">{f.a}</div>
+            <div className="faq-answer">{faqParts(f.a).map((p, i) => (typeof p === 'string' ? p : <Link key={i} to={p.to}>{p.text}</Link>))}</div>
           </details>
         ))}
       </div>

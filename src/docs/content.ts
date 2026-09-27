@@ -18,6 +18,9 @@ export interface DocPage {
   description: string;
   section: string;
   order: number;
+  /** Optional frontmatter: an icon name for the sidebar, and a small label ("New"). */
+  icon?: string;
+  badge?: string;
   body: string;
 }
 
@@ -54,6 +57,8 @@ export const PAGES: DocPage[] = Object.entries(files)
       description: meta.description || '',
       section: meta.section || 'Getting started',
       order: Number(meta.order) || 99,
+      icon: meta.icon || undefined,
+      badge: meta.badge || undefined,
       body,
     };
   })
@@ -73,13 +78,16 @@ export function sectionsWithPages(): { name: string; slug: string; pages: DocPag
   return out;
 }
 
-const DOC_ALIASES: Record<string, string> = {
+export const DOC_ALIASES: Record<string, string> = {
   '/docs/policies/dmca': '/docs/policies/copyright-and-dmca',
   '/docs/dmca': '/docs/policies/copyright-and-dmca',
   '/dmca': '/docs/policies/copyright-and-dmca',
   '/docs/policies/copyright': '/docs/policies/copyright-and-dmca',
   '/docs/copyright': '/docs/policies/copyright-and-dmca',
 };
+
+/** Docs routes, including the short aliases such as /dmca. */
+export const isDocsPath = (path: string) => path === '/docs' || path.startsWith('/docs/') || path.replace(/\/+$/, '') in DOC_ALIASES;
 
 export function findPage(path: string): DocPage | undefined {
   const clean = path.replace(/\/+$/, '');
@@ -119,12 +127,18 @@ function callouts(md: string): string {
   return out.join('\n');
 }
 
+// Set for the duration of one synchronous parse: release notes shift their headings down a
+// level or two and prefix their ids, so several releases can share one page.
+let headingShift = 0;
+let idPrefix = '';
+
 const marked = new Marked({
   gfm: true,
   renderer: {
-    heading({ tokens, depth }: Tokens.Heading) {
+    heading({ tokens, depth: raw }: Tokens.Heading) {
       const html = this.parser.parseInline(tokens);
-      const id = slugify(html);
+      const depth = Math.min(6, raw + headingShift);
+      const id = `${idPrefix}${slugify(html)}`;
       if (depth === 1) return `<h1>${html}</h1>\n`;
       return `<h${depth} id="${id}"><a class="anchor" href="#${id}" aria-hidden="true" tabindex="-1">#</a>${html}</h${depth}>\n`;
     },
@@ -138,13 +152,58 @@ const marked = new Marked({
   },
 });
 
-export function render(page: DocPage): { html: string; headings: Heading[] } {
-  const html = marked.parse(callouts(page.body), { async: false }) as string;
+const plain = (html: string) => html.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+/**
+ * Markdown to HTML plus its h2/h3 outline. `shift` moves headings down (release notes sit under
+ * a version heading), `prefix` keeps heading ids unique when several documents share a page.
+ */
+export function renderMarkdown(md: string, opts: { shift?: number; prefix?: string; untrusted?: boolean } = {}): { html: string; headings: Heading[] } {
+  headingShift = opts.shift ?? 0;
+  idPrefix = opts.prefix ?? '';
+  let html: string;
+  try {
+    html = marked.parse(callouts(md), { async: false }) as string;
+  } finally {
+    headingShift = 0;
+    idPrefix = '';
+  }
+  if (opts.untrusted) html = sanitize(html);
   const headings: Heading[] = [];
   for (const m of html.matchAll(/<h([23]) id="([^"]+)"><a[^>]*>#<\/a>([\s\S]*?)<\/h\1>/g)) {
-    headings.push({ depth: Number(m[1]) as 2 | 3, id: m[2], text: m[3].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"') });
+    headings.push({ depth: Number(m[1]) as 2 | 3, id: m[2], text: plain(m[3]) });
   }
   return { html, headings };
+}
+
+export function render(page: DocPage): { html: string; headings: Heading[] } {
+  return renderMarkdown(page.body);
+}
+
+/**
+ * Release notes are written on GitHub, so treat their HTML as untrusted: drop scripts, frames,
+ * inline event handlers and javascript: links; keep everything a release note actually uses.
+ */
+function sanitize(html: string): string {
+  return html
+    .replace(/<(script|style|iframe|object|embed|form|input|button|textarea|select|link|meta|base)\b[\s\S]*?(<\/\1\s*>|\/?>)/gi, '')
+    .replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/(href|src)\s*=\s*("|')\s*(javascript|vbscript|data:text\/html)[^"']*\2/gi, '$1="#"');
+}
+
+/** First sentence-ish of a Markdown document, as plain text, for meta descriptions. */
+export function summarise(md: string, max = 155): string {
+  const text = md
+    .replace(/^#{1,6}\s.*$/gm, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, ' ')
+    .replace(/^\s*-{3,}\s*$/gm, ' ')
+    .replace(/[*_`>#|]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > max ? `${text.slice(0, max - 1).replace(/\s+\S*$/, '')}…` : text;
 }
 
 // ── Search ──────────────────────────────────────────────────────────────────
