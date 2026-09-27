@@ -4,17 +4,208 @@
 
 .hero {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  padding: calc(var(--header) + 72px) 0 56px;
+  display: flex;
+  align-items: center;
+  min-height: min(100svh, 1000px);
+  padding: calc(var(--header) + 48px) 0 88px;
 }
 .hero-glow {
   position: absolute;
   inset: -20% -10% auto;
   height: 90%;
   background:
-    radial-gradient(50% 55% at 50% 30%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 70%),
-    radial-gradient(30% 40% at 80% 10%, color-mix(in oklab, var(--accent-hi) 12%, transparent), transparent 70%);
+    radial-gradient(45% 50% at 50% 34%, color-mix(in oklab, var(--accent) 20%, transparent), transparent 70%),
+    radial-gradient(30% 40% at 80% 10%, color-mix(in oklab, var(--accent-hi) 10%, transparent), transparent 70%);
   pointer-events: none;
+}
+
+/* The poster wall: columns of covers on a tilted plane, drifting in opposite directions. */
+.wall {
+  --gap: 18px;
+  --tile: 172px;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1400px;
+  animation: wall-in 1.8s var(--ease-out) 0.15s both;
+}
+@keyframes wall-in {
+  from {
+    opacity: 0;
+  }
+}
+.wall-plane {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  gap: var(--gap);
+  opacity: 0.5;
+  transform: translate(-50%, -50%) rotateX(24deg) rotateZ(-12deg) scale(1.18);
+}
+.wall-col {
+  flex: 0 0 var(--tile);
+}
+/*
+ * The track holds the column twice, plus one gap at the end, so exactly half of it is one
+ * copy: moving it by -50% loops without a seam. Plain keyframes (no variables or calc) keep
+ * the animation on the GPU compositor instead of the page's main thread.
+ */
+.wall-track {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding-bottom: var(--gap);
+  animation: wall-up var(--speed) linear infinite;
+  animation-delay: calc(var(--speed) * var(--start));
+  will-change: transform;
+}
+.wall-col.is-down .wall-track {
+  animation-name: wall-down;
+}
+@keyframes wall-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+@keyframes wall-down {
+  from {
+    transform: translate3d(0, -50%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+.wall[data-still] .wall-track {
+  animation-play-state: paused;
+}
+.wall-tile {
+  display: block;
+  aspect-ratio: 230 / 326;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgb(239 233 225 / 0.06);
+}
+.wall-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Fades the wall into the ink: dark behind the words, the covers showing at the edges. */
+.wall-fade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 52% 58% at 50% 48%, rgb(12 11 10 / 0.94), rgb(12 11 10 / 0.7) 55%, rgb(12 11 10 / 0.25) 100%),
+    linear-gradient(to bottom, var(--ink-0), transparent 16%, transparent 68%, var(--ink-0));
+}
+
+/* "What's new" pill with a slowly travelling ink line around it. */
+@property --news-spin {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.hero-news {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 26px;
+  padding: 5px 14px 5px 5px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--ink-1), var(--ink-1)) padding-box,
+    conic-gradient(from var(--news-spin), var(--line-2) 0deg, var(--accent) 60deg, var(--line-2) 120deg, var(--line-2) 360deg) border-box;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--paper-2);
+  animation: news-spin 5s linear infinite;
+  transition: color var(--fast) var(--ease);
+}
+.hero-news:hover {
+  color: var(--paper);
+}
+.hero-news-tag {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11.5px;
+  font-weight: 760;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.hero-news svg {
+  transition: transform var(--fast) var(--ease);
+}
+.hero-news:hover svg {
+  transform: translateX(3px);
+}
+@keyframes news-spin {
+  to {
+    --news-spin: 360deg;
+  }
+}
+
+/* A light sweep across the download button on hover. */
+.button.is-shine {
+  position: relative;
+  overflow: hidden;
+}
+.button.is-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.35) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+.button.is-shine:hover::after {
+  transform: translateX(120%);
+  transition: transform 0.7s var(--ease-out);
+}
+.button.is-glass {
+  background: rgb(19 18 16 / 0.72);
+}
+.button.is-glass:hover {
+  background: rgb(37 34 32 / 0.85);
+}
+
+@media (max-width: 640px) {
+  .wall {
+    --gap: 12px;
+    --tile: 112px;
+  }
+  .wall-plane {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) rotateX(20deg) rotateZ(-12deg) scale(1.12);
+  }
+  /* Four columns fill a phone; the rest aren't drawn, and their covers aren't downloaded. */
+  .wall-col:nth-child(n + 5) {
+    display: none;
+  }
+  /* The travelling border repaints every frame; phones keep a still one. */
+  .hero-news {
+    animation: none;
+    --news-spin: 200deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall,
+  .wall-track,
+  .hero-news {
+    animation: none;
+  }
 }
 .hero-kana {
   position: absolute;
@@ -26,6 +217,7 @@
 }
 .hero-inner {
   position: relative;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,28 +268,34 @@
   gap: 12px;
   margin-top: 32px;
 }
-.platforms-row {
+.hero-meta {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px 22px;
-  margin-top: 36px;
-  color: var(--paper-2);
-}
-.platforms-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--paper-4);
-}
-.platform {
-  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
-  font-weight: 620;
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--paper-3);
+}
+.hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.hero-facts > * + *::before {
+  content: '·';
+  display: inline-block;
+  margin: 0 10px;
+  color: var(--paper-4);
+}
+.hero-meta a {
+  color: var(--paper-2);
+  text-decoration: underline;
+  text-decoration-color: var(--line-3);
+  text-underline-offset: 3px;
+}
+.hero-meta a:hover {
+  color: var(--paper);
 }
 
 /* ── Showcase ── */
@@ -365,13 +563,212 @@
   text-underline-offset: 3px;
 }
 
+/* ── The player, drawn in code (Watch feature) ── */
+
+.pm {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #101820;
+  container-type: inline-size;
+  color: #f4efe8;
+}
+.frame .pm-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% 40%;
+}
+.pm-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / 0.55), transparent 22%, transparent 55%, rgb(0 0 0 / 0.82)),
+    radial-gradient(120% 90% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.35));
+}
+.pm-top {
+  position: absolute;
+  top: 4.5cqw;
+  left: 4.5cqw;
+  display: flex;
+  align-items: center;
+  gap: 2cqw;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.7);
+}
+.pm-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3cqw;
+  font-size: max(11px, 2.2cqw);
+}
+.pm-title strong {
+  font-weight: 700;
+}
+.pm-title span {
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+.pm-subtitle {
+  position: absolute;
+  left: 50%;
+  bottom: 12.5cqw;
+  width: max-content;
+  max-width: 70%;
+  transform: translateX(-50%);
+  padding: 0.6cqw 1.6cqw;
+  border-radius: 0.8cqw;
+  background: rgb(0 0 0 / 0.55);
+  font-size: max(11px, 2.6cqw);
+  font-weight: 600;
+  text-align: center;
+}
+.pm-skip {
+  position: absolute;
+  right: 4.5cqw;
+  bottom: 22cqw;
+  display: inline-flex;
+  align-items: center;
+  gap: 1cqw;
+  padding: 1.3cqw 2.2cqw;
+  border-radius: 1cqw;
+  background: var(--paper);
+  color: var(--ink-0);
+  font-size: max(10px, 2.1cqw);
+  font-weight: 700;
+}
+.pm-skip::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  animation: pm-pulse 2.6s var(--ease-out) infinite;
+}
+@keyframes pm-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+.pm-bar {
+  position: absolute;
+  left: 4.5cqw;
+  right: 4.5cqw;
+  bottom: 3.5cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 2cqw;
+}
+.pm-progress {
+  position: relative;
+  height: max(3px, 0.7cqw);
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.22);
+}
+.pm-progress > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+}
+/* The opening is marked on the bar, which is what Skip intro jumps over. */
+.pm-opening {
+  left: 1% !important;
+  width: 6.2%;
+  background: rgb(255 255 255 / 0.28);
+}
+.pm-buffered {
+  width: 24%;
+  background: rgb(255 255 255 / 0.3);
+}
+.pm-played {
+  width: 6.5%;
+  background: var(--accent);
+}
+.pm-knob {
+  left: 6.5% !important;
+  top: 50% !important;
+  bottom: auto !important;
+  width: max(10px, 1.9cqw);
+  height: max(10px, 1.9cqw);
+  border-radius: 50% !important;
+  background: var(--accent);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 3px rgb(0 0 0 / 0.35);
+}
+.pm-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pm-group {
+  display: flex;
+  align-items: center;
+  gap: 2.6cqw;
+}
+.pm-group svg {
+  width: max(12px, 2.6cqw);
+  height: max(12px, 2.6cqw);
+}
+.pm-time {
+  font-size: max(10px, 1.9cqw);
+  opacity: 0.85;
+}
+.pm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8cqw;
+  padding: 0.6cqw 1.4cqw;
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.14);
+  font-size: max(10px, 1.8cqw);
+  font-weight: 650;
+}
+.pm-keys {
+  position: absolute;
+  top: 4.5cqw;
+  right: 4.5cqw;
+  display: flex;
+  align-items: center;
+  gap: 0.9cqw;
+  font-size: max(10px, 1.7cqw);
+  opacity: 0.8;
+}
+.pm-keys kbd {
+  font-size: 1em;
+}
+@media (max-width: 520px) {
+  .pm-keys {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pm-skip::after {
+    animation: none;
+  }
+}
+
 /* ── Closing ── */
 
 .closing {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   padding: clamp(80px, 12vw, 160px) 0;
   border-top: 1px solid var(--line);
+}
+/* The closing wall sits quieter than the hero's, so the last word stays with the buttons. */
+.closing .wall-plane {
+  opacity: 0.34;
 }
 .closing-glow {
   position: absolute;

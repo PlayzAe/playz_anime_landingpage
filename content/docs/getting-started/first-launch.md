@@ -9,7 +9,7 @@ order: 3
 
 Every launch opens with a short animation of the PlayzAnime seal. The very first launch follows it with a one-time setup. It usually takes under a minute and never shows again.
 
-![First launch: one-time setup](/screenshots/setup.png)
+![The opening animation that plays on every launch](/screenshots/intro.png)
 
 ## 1. Getting things ready
 

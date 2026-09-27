@@ -1,5 +1,5 @@
 import { Marked, type Tokens } from 'marked';
-import { href } from '../lib/router';
+import { asset, href } from '../lib/router';
 
 /*
  * The docs are plain Markdown files in content/docs/<section>/<page>.md, each
@@ -141,6 +141,12 @@ const marked = new Marked({
       const id = `${idPrefix}${slugify(html)}`;
       if (depth === 1) return `<h1>${html}</h1>\n`;
       return `<h${depth} id="${id}"><a class="anchor" href="#${id}" aria-hidden="true" tabindex="-1">#</a>${html}</h${depth}>\n`;
+    },
+    // Pictures live in /public, so they need the site's base path (GitHub Pages serves it under /<repo>/).
+    image({ href: src, title, text }: Tokens.Image) {
+      const url = /^[a-z]+:|^\/\//i.test(src) ? src : asset(src);
+      const t = title ? ` title="${title}"` : '';
+      return `<img src="${url}" alt="${text}"${t} loading="lazy" decoding="async" />`;
     },
     link({ href: target, title, tokens }: Tokens.Link) {
       const text = this.parser.parseInline(tokens);

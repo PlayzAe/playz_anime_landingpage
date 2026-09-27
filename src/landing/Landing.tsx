@@ -1,12 +1,15 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Icon, type IconName } from '../components/Icon';
+import { formatSize, releasePath, useLiveReleases, type Release } from '../docs/changelog';
 import { Logo } from '../components/Logo';
 import { Frame, Shot, type ShotName } from '../components/Shot';
 import { DOWNLOAD_URL, GITHUB_URL, WEB_APP_URL } from '../lib/links';
 import { Link } from '../lib/router';
 import { EASE, Reveal, Vertical } from './bits';
 import { FAQ, faqParts } from './faq';
+import { PlayerMock } from './PlayerMock';
+import { posterColumns, posterUrl } from './posters';
 import './landing.css';
 
 export function Landing() {
@@ -23,15 +26,14 @@ export function Landing() {
           title="Its own player. No ads, ever."
           body="Episodes play in PlayzAnime's player, not a page full of pop-ups. Skip the intro, pick subtitles in any script, and keep your hands on the keyboard. It remembers where you stopped and whether you like the dub."
           points={['Skip intro and up next', 'Subtitles for every script', 'Keyboard shortcuts', 'Sub or dub, remembered per show']}
-          shot="home"
-          alt="PlayzAnime's home screen with the continue-watching shelf"
+          visual={<PlayerMock />}
           kana="再生"
         />
         <Feature
           flip
           eyebrow="Read"
-          title="Manga, manhwa and manhua. Four sources, picked for you."
-          body="PlayzAnime checks MangaDex, WeebCentral, Flame Comics and MangaPill at once and reads from whichever is furthest along, skipping any that are down. Manga opens right to left; webtoons open as one long strip."
+          title="Manga, manhwa and manhua. Sixty sources, picked for you."
+          body="PlayzAnime checks MangaDex, Asura Scans, WeebCentral, Flame Comics, MangaPill and 55 community sources at once, and reads from whichever is furthest along, skipping any that are down. Manga opens right to left; webtoons open as one long strip."
           points={['Automatic source pick with health checks', 'Paged and scrolling reader', '"Read from another source" when one fails', 'Progress saved to the page']}
           shot="manga"
           alt="The manga home screen with trending manhwa"
@@ -77,13 +79,72 @@ export function Landing() {
 
 // ── Hero ────────────────────────────────────────────────────────────────────
 
+/**
+ * A wall of covers drifting behind the hero, tilted back and faded into the page. The motion
+ * is CSS transforms only (the compositor does the work), it stops when the hero is scrolled
+ * away, phones get fewer and smaller covers, and reduced-motion users get a still wall.
+ */
+function PosterWall() {
+  const speeds = [66, 84, 58, 92, 72, 78];
+  const ref = useRef<HTMLDivElement>(null);
+
+  // The wall only moves while it's on screen.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(([entry]) => el.toggleAttribute('data-still', !entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="wall" aria-hidden="true">
+      <div className="wall-plane">
+        {posterColumns(6).map((col, c) => (
+          <div
+            key={c}
+            className={`wall-col${c % 2 ? ' is-down' : ''}`}
+            style={{ '--speed': `${speeds[c]}s`, '--start': `${-(c * 0.17) % 1}` } as CSSProperties}
+          >
+            <div className="wall-track">
+              {[...col, ...col].map((p, i) => (
+                <span key={i} className="wall-tile" style={{ backgroundColor: p[2] }}>
+                  <img src={posterUrl(p)} alt="" width={230} height={326} loading="lazy" decoding="async" fetchPriority="low" />
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="wall-fade" />
+    </div>
+  );
+}
+
+/** The newest release's Windows installer, when the release has one attached. */
+const installerOf = (release: Release | undefined) => release?.assets.find((a) => /setup.*\.exe$/i.test(a.name));
+
 function Hero() {
   const reduced = useReducedMotion();
+  const { releases } = useLiveReleases();
+  const latest = releases[0];
+  const installer = installerOf(latest);
+
   return (
     <section className="hero" aria-labelledby="hero-title">
+      <PosterWall />
       <div className="hero-glow" aria-hidden="true" />
       <Vertical className="hero-kana">アニメとマンガ</Vertical>
       <div className="hero-inner page">
+        {latest && (
+          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6, ease: EASE }}>
+            <Link to={releasePath(latest)} className="hero-news">
+              <span className="hero-news-tag">New</span>
+              What’s new in {latest.tag}
+              <Icon name="arrowRight" size={14} />
+            </Link>
+          </motion.div>
+        )}
         <div className="hero-seal">
           {!reduced && (
             <motion.span className="hero-ring" initial={{ scale: 0.4, opacity: 0.9 }} animate={{ scale: 2.4, opacity: 0 }} transition={{ delay: 0.45, duration: 1.1, ease: 'easeOut' }} />
@@ -116,23 +177,25 @@ function Hero() {
           Watch and download anime. Read and download manga, manhwa and manhua. Offline when you need it, beautiful when you don't.
         </motion.p>
         <motion.div className="hero-ctas" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.15, duration: 0.6, ease: EASE }}>
-          <a className="button is-primary" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
+          {/* Straight to the installer when the build knows it; the releases page otherwise. */}
+          <a className="button is-primary is-shine" href={installer?.url ?? DOWNLOAD_URL} rel="noopener noreferrer">
             <Icon name="windows" size={18} />
             Download for Windows
           </a>
-          <a className="button" href={WEB_APP_URL} target="_blank" rel="noopener noreferrer">
+          <a className="button is-glass" href={WEB_APP_URL} target="_blank" rel="noopener noreferrer">
             <Icon name="globe" size={18} />
             Open the web app
           </a>
         </motion.div>
-        <motion.div className="platforms-row" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.35, duration: 0.8 }}>
-          <span className="platforms-label">Available on</span>
-          <span className="platform">
-            <Icon name="windows" size={18} /> Windows
-          </span>
-          <span className="platform">
-            <Icon name="globe" size={18} /> Web
-          </span>
+        <motion.div className="hero-meta" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.35, duration: 0.8 }}>
+          <p className="hero-facts">
+            {latest && <span className="num">{latest.tag}</span>}
+            {installer && <span className="num">{formatSize(installer.size)}</span>}
+            <span>Windows 10 and 11</span>
+          </p>
+          <a href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
+            Portable and older versions
+          </a>
         </motion.div>
       </div>
     </section>
@@ -168,14 +231,16 @@ interface FeatureProps {
   title: string;
   body: string;
   points: string[];
-  shot: ShotName;
-  alt: string;
+  /** A screenshot, with its description, or anything else to show in the frame. */
+  shot?: ShotName;
+  alt?: string;
+  visual?: ReactNode;
   kana: string;
   flip?: boolean;
   tag?: string;
 }
 
-function Feature({ eyebrow, title, body, points, shot, alt, kana, flip, tag }: FeatureProps) {
+function Feature({ eyebrow, title, body, points, shot, alt, visual, kana, flip, tag }: FeatureProps) {
   return (
     <article className={`feature${flip ? ' is-flipped' : ''}`}>
       <Reveal className="feature-copy">
@@ -197,7 +262,7 @@ function Feature({ eyebrow, title, body, points, shot, alt, kana, flip, tag }: F
       <Reveal className="feature-shot" delay={0.1} y={40}>
         <Vertical className="feature-kana">{kana}</Vertical>
         <Frame variant="bare">
-          <Shot name={shot} alt={alt} />
+          {visual ?? (shot && <Shot name={shot} alt={alt ?? ''} />)}
         </Frame>
       </Reveal>
     </article>
@@ -317,8 +382,11 @@ function Faq() {
 }
 
 function Closing() {
+  const { releases } = useLiveReleases();
+  const installer = installerOf(releases[0]);
   return (
     <section className="closing" aria-labelledby="closing-title">
+      <PosterWall />
       <div className="closing-glow" aria-hidden="true" />
       <Reveal className="closing-inner page">
         <Logo size={56} title="" />
@@ -327,12 +395,12 @@ function Closing() {
         </h2>
         <p>Free, ad-free, and yours in a minute.</p>
         <div className="hero-ctas">
-          <a className="button is-primary" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
+          <a className="button is-primary is-shine" href={installer?.url ?? DOWNLOAD_URL} rel="noopener noreferrer">
             <Icon name="windows" size={18} /> Download for Windows
           </a>
-          <Link to="/docs" className="button">
-            Read the docs
-          </Link>
+          <a className="button is-glass" href={WEB_APP_URL} target="_blank" rel="noopener noreferrer">
+            <Icon name="globe" size={18} /> Open the web app
+          </a>
           <a className="button is-quiet" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
             <Icon name="github" size={18} /> GitHub
           </a>
