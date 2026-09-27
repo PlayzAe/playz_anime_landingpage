@@ -7,7 +7,7 @@ order: 2
 
 # The reader
 
-![The manga home page](/screenshots/manga.png)
+![The manga home page](/screenshots/manga.webp)
 
 ## Open a chapter
 

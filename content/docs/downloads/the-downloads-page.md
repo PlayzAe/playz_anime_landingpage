@@ -9,7 +9,7 @@ order: 3
 
 Open **Downloads** from the left rail. The icon shows a number while downloads are running.
 
-![Downloads, grouped by series and quality](/screenshots/downloads.png)
+![Downloads, grouped by series and quality](/screenshots/downloads.webp)
 
 ## Folders
 

@@ -260,14 +260,135 @@
 .frame-bare {
   box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
 }
-.crop {
+
+/* ── Screenshots you can click to see bigger ── */
+
+.zoom {
   position: relative;
   display: block;
-  overflow: hidden;
+  width: 100%;
+  cursor: zoom-in;
 }
-.crop img {
+.zoom-shot {
+  display: block;
+}
+.zoom-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.zoom-hint {
   position: absolute;
-  max-width: none;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgb(12 11 10 / 0.75);
+  color: var(--paper);
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity var(--fast) var(--ease),
+    transform var(--med) var(--ease-out);
+}
+.zoom:hover .zoom-hint,
+.zoom:focus-visible .zoom-hint {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: none) {
+  .zoom-hint {
+    opacity: 0.9;
+    transform: none;
+  }
+}
+
+/* The larger view: centred, with the page still showing, dimmed, around it. */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: clamp(16px, 5vw, 72px);
+  background: rgb(8 7 6 / 0.8);
+  cursor: zoom-out;
+}
+.viewer-figure {
+  max-width: min(1400px, 100%);
+  line-height: 0;
+  border-radius: var(--radius-3);
+  overflow: hidden;
+  box-shadow:
+    0 30px 90px rgb(0 0 0 / 0.6),
+    0 0 0 1px var(--line-2);
+  cursor: default;
+}
+.viewer-figure img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 160px);
+}
+.viewer-caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  font-size: 14px;
+  text-align: center;
+  color: var(--paper-2);
+  cursor: default;
+}
+.viewer-caption .num {
+  color: var(--paper-4);
+}
+.viewer-btn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: rgb(27 25 23 / 0.9);
+  color: var(--paper);
+  cursor: pointer;
+  transition: background var(--fast) var(--ease);
+}
+.viewer-btn:hover {
+  background: var(--ink-3);
+}
+.viewer-btn.is-close {
+  top: 16px;
+  right: 16px;
+}
+.viewer-btn.is-prev,
+.viewer-btn.is-next {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.viewer-btn.is-prev {
+  left: 16px;
+}
+.viewer-btn.is-next {
+  right: 16px;
+}
+@media (max-width: 700px) {
+  .viewer-btn.is-prev,
+  .viewer-btn.is-next {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+  }
 }
 .v-accent {
   writing-mode: vertical-rl;

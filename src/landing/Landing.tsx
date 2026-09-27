@@ -1,23 +1,39 @@
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Icon, type IconName } from '../components/Icon';
-import { formatSize, releasePath, useLiveReleases, type Release } from '../docs/changelog';
 import { Logo } from '../components/Logo';
-import { Frame, Shot, type ShotName } from '../components/Shot';
+import { Frame, ShotViewerProvider, ZoomShot, type ShotItem, type ShotName } from '../components/Shot';
+import { formatSize, releasePath, useLiveReleases, type Release } from '../docs/changelog';
 import { DOWNLOAD_URL, GITHUB_URL, WEB_APP_URL } from '../lib/links';
 import { Link } from '../lib/router';
 import { EASE, Reveal, Vertical } from './bits';
 import { FAQ, faqParts } from './faq';
-import { PlayerMock } from './PlayerMock';
 import { posterColumns, posterUrl } from './posters';
 import './landing.css';
+
+/** Every screen on the page, in order: the larger view steps through them with the arrow keys. */
+const TOUR: ShotItem[] = [
+  { name: 'home', alt: 'Home: continue watching, with the show you were on up front' },
+  { name: 'player', alt: 'The player, with Skip intro and the episode list' },
+  { name: 'manga', alt: 'Manga home: trending manhwa and continue reading' },
+  { name: 'downloads', alt: 'Downloads, grouped by series, playable offline' },
+  { name: 'profiles', alt: 'Your profile, and the ones friends shared with you' },
+  { name: 'settings', alt: 'Settings, with the five accent colours' },
+  { name: 'detail', alt: 'A series page: episodes, related shows and the details' },
+  { name: 'discover', alt: 'Discover: everything on AniList, filtered your way' },
+  { name: 'manga-rows', alt: 'Trending manga and Korean manhwa' },
+  { name: 'schedule', alt: 'The week’s schedule, in your time zone' },
+  { name: 'home-top', alt: 'The top 10 this week and the season’s most popular shows' },
+  { name: 'discover-manga', alt: 'Discover for manga, manhwa and manhua' },
+];
+const altOf = (name: ShotName) => TOUR.find((t) => t.name === name)?.alt ?? '';
 
 export function Landing() {
   useEffect(() => {
     document.title = 'PlayzAnime: free anime & manga app for Windows, open source';
   }, []);
   return (
-    <>
+    <ShotViewerProvider>
       <Hero />
       <Showcase />
       <section id="features" className="features page" aria-label="Features">
@@ -26,7 +42,7 @@ export function Landing() {
           title="Its own player. No ads, ever."
           body="Episodes play in PlayzAnime's player, not a page full of pop-ups. Skip the intro, pick subtitles in any script, and keep your hands on the keyboard. It remembers where you stopped and whether you like the dub."
           points={['Skip intro and up next', 'Subtitles for every script', 'Keyboard shortcuts', 'Sub or dub, remembered per show']}
-          visual={<PlayerMock />}
+          shot="player"
           kana="再生"
         />
         <Feature
@@ -36,7 +52,6 @@ export function Landing() {
           body="PlayzAnime checks MangaDex, Asura Scans, WeebCentral, Flame Comics, MangaPill and 55 community sources at once, and reads from whichever is furthest along, skipping any that are down. Manga opens right to left; webtoons open as one long strip."
           points={['Automatic source pick with health checks', 'Paged and scrolling reader', '"Read from another source" when one fails', 'Progress saved to the page']}
           shot="manga"
-          alt="The manga home screen with trending manhwa"
           kana="読む"
         />
         <Feature
@@ -45,7 +60,6 @@ export function Landing() {
           body="Episodes save as MP4 with subtitles inside; chapters save as CBZ. A download picks up where it stopped, waits out busy hosts, and files itself neatly: PlayzAnime\Show\Season 2\Show_E05_720p.mp4."
           points={['Resumes where it stopped', 'Grouped by show, episode and quality', 'Plays and reads offline, inside the app', 'Your folders, your choice']}
           shot="downloads"
-          alt="The downloads page grouped by series, episode and quality"
           kana="保存"
           tag="Windows app"
         />
@@ -55,8 +69,7 @@ export function Landing() {
           title="A profile you can hand to a friend."
           body="Pick a name, a picture and your favourites. Share your profile as a small .playzanime file; your friend drops it onto their app and sees what you've watched and read, in its own tab. Nothing leaves your device unless you send it."
           points={['No accounts, no sign-up', 'Drag, drop, done', 'Add their picks to your list in one click']}
-          shot="friend"
-          alt="A friend's shared profile with their favourites"
+          shot="profiles"
           kana="友達"
         />
         <Feature
@@ -65,27 +78,30 @@ export function Landing() {
           body="Choose an accent named after a traditional Japanese colour: shu vermilion, yamabuki gold, matcha, ai indigo or sakura. The whole app, from the play button to the opening stamp, takes it on. Try the swatches at the top of this page."
           points={['Accent colours with a story', 'Data saver for slow connections', 'Original titles set vertically']}
           shot="settings"
-          alt="The settings page with the five accent colours"
           kana="朱色"
         />
       </section>
+      <Gallery />
       <Extras />
       <Platforms />
       <Faq />
       <Closing />
-    </>
+    </ShotViewerProvider>
   );
 }
 
 // ── Hero ────────────────────────────────────────────────────────────────────
 
+const WALL_COLUMNS = 12;
+const WALL_SPEEDS = [66, 84, 58, 92, 72, 78, 62, 88, 70, 80, 60, 86];
+
 /**
- * A wall of covers drifting behind the hero, tilted back and faded into the page. The motion
- * is CSS transforms only (the compositor does the work), it stops when the hero is scrolled
- * away, phones get fewer and smaller covers, and reduced-motion users get a still wall.
+ * A wall of covers drifting behind the hero, tilted back and faded into the page, edge to
+ * edge on any screen: wide screens show more columns, phones fewer (hidden columns never
+ * download their covers). The motion is CSS transforms only, run by the compositor, it
+ * stops while the wall is off screen, and reduced-motion users get a still wall.
  */
 function PosterWall() {
-  const speeds = [66, 84, 58, 92, 72, 78];
   const ref = useRef<HTMLDivElement>(null);
 
   // The wall only moves while it's on screen.
@@ -100,11 +116,11 @@ function PosterWall() {
   return (
     <div ref={ref} className="wall" aria-hidden="true">
       <div className="wall-plane">
-        {posterColumns(6).map((col, c) => (
+        {posterColumns(WALL_COLUMNS).map((col, c) => (
           <div
             key={c}
             className={`wall-col${c % 2 ? ' is-down' : ''}`}
-            style={{ '--speed': `${speeds[c]}s`, '--start': `${-(c * 0.17) % 1}` } as CSSProperties}
+            style={{ '--speed': `${WALL_SPEEDS[c]}s`, '--start': `${-((c * 0.17) % 1)}` } as CSSProperties}
           >
             <div className="wall-track">
               {[...col, ...col].map((p, i) => (
@@ -214,8 +230,8 @@ function Showcase() {
     <section className="showcase page" aria-label="The PlayzAnime app">
       <div ref={ref} className="showcase-stage">
         <motion.div style={{ rotateX, scale, y }} className="showcase-tilt">
-          <Frame className="showcase-frame">
-            <Shot name="home" alt="PlayzAnime's home screen: continue watching, trending anime and this season" priority sizes="(max-width: 1000px) 96vw, 1100px" />
+          <Frame className="showcase-frame" variant="bare">
+            <ZoomShot name="home" alt={altOf('home')} group={TOUR} priority sizes="(max-width: 1000px) 96vw, 1100px" />
           </Frame>
         </motion.div>
         <div className="showcase-shadow" aria-hidden="true" />
@@ -231,16 +247,13 @@ interface FeatureProps {
   title: string;
   body: string;
   points: string[];
-  /** A screenshot, with its description, or anything else to show in the frame. */
-  shot?: ShotName;
-  alt?: string;
-  visual?: ReactNode;
+  shot: ShotName;
   kana: string;
   flip?: boolean;
   tag?: string;
 }
 
-function Feature({ eyebrow, title, body, points, shot, alt, visual, kana, flip, tag }: FeatureProps) {
+function Feature({ eyebrow, title, body, points, shot, kana, flip, tag }: FeatureProps) {
   return (
     <article className={`feature${flip ? ' is-flipped' : ''}`}>
       <Reveal className="feature-copy">
@@ -262,12 +275,48 @@ function Feature({ eyebrow, title, body, points, shot, alt, visual, kana, flip, 
       <Reveal className="feature-shot" delay={0.1} y={40}>
         <Vertical className="feature-kana">{kana}</Vertical>
         <Frame variant="bare">
-          {visual ?? (shot && <Shot name={shot} alt={alt ?? ''} />)}
+          <ZoomShot name={shot} alt={altOf(shot)} group={TOUR} />
         </Frame>
       </Reveal>
     </article>
   );
 }
+
+// ── Gallery ─────────────────────────────────────────────────────────────────
+
+const GALLERY: { name: ShotName; caption: string }[] = [
+  { name: 'detail', caption: 'Every series has a page: episodes, related shows, the details.' },
+  { name: 'discover', caption: 'Discover everything on AniList, filtered your way.' },
+  { name: 'manga-rows', caption: 'Trending manga and manhwa, one click from reading.' },
+  { name: 'schedule', caption: 'This week’s schedule, in your time zone.' },
+  { name: 'home-top', caption: 'The top 10 this week and the season’s biggest shows.' },
+  { name: 'discover-manga', caption: 'Manga, manhwa and manhua in one place.' },
+];
+
+function Gallery() {
+  return (
+    <section className="gallery page" aria-labelledby="gallery-title">
+      <Reveal className="gallery-head">
+        <h2 id="gallery-title" className="section-title display">
+          Take a look around
+        </h2>
+        <p>Click any screen to see it bigger.</p>
+      </Reveal>
+      <div className="gallery-grid">
+        {GALLERY.map((g, i) => (
+          <Reveal key={g.name} className="gallery-item" delay={0.06 * (i % 3)}>
+            <Frame variant="bare">
+              <ZoomShot name={g.name} alt={altOf(g.name)} group={TOUR} sizes="(max-width: 700px) 84vw, (max-width: 1100px) 46vw, 400px" />
+            </Frame>
+            <p>{g.caption}</p>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Extras and platforms ────────────────────────────────────────────────────
 
 const EXTRAS: { icon: IconName; title: string; body: string }[] = [
   { icon: 'shield', title: 'No ads, no trackers', body: 'No pop-ups, no analytics, no cookies. Not now, not later.' },
@@ -358,7 +407,15 @@ function PlatformCard({ icon, name, lede, items, cta }: { icon: IconName; name: 
   );
 }
 
+// ── Questions ───────────────────────────────────────────────────────────────
+
+/**
+ * One answer open at a time. Answers stay in the page (search engines read them) and open by
+ * growing their height, then fading the words in.
+ */
 function Faq() {
+  const [open, setOpen] = useState<number | null>(null);
+  const id = useId();
   return (
     <section id="faq" className="faq page" aria-labelledby="faq-title">
       <Reveal>
@@ -367,19 +424,40 @@ function Faq() {
         </h2>
       </Reveal>
       <div className="faq-list">
-        {FAQ.map((f) => (
-          <details key={f.q} className="faq-item">
-            <summary>
-              {f.q}
-              <Icon name="plus" size={18} />
-            </summary>
-            <div className="faq-answer">{faqParts(f.a).map((p, i) => (typeof p === 'string' ? p : <Link key={i} to={p.to}>{p.text}</Link>))}</div>
-          </details>
-        ))}
+        {FAQ.map((f, i) => {
+          const isOpen = open === i;
+          return (
+            <div key={f.q} className={`faq-item${isOpen ? ' is-open' : ''}`}>
+              <h3>
+                <button type="button" id={`${id}-q${i}`} aria-expanded={isOpen} aria-controls={`${id}-a${i}`} onClick={() => setOpen(isOpen ? null : i)}>
+                  {f.q}
+                  <span className="faq-icon" aria-hidden="true" />
+                </button>
+              </h3>
+              <div id={`${id}-a${i}`} role="region" aria-labelledby={`${id}-q${i}`} className="faq-panel" inert={!isOpen}>
+                <div className="faq-panel-inner">
+                  <p className="faq-answer">
+                    {faqParts(f.a).map((p, j) =>
+                      typeof p === 'string' ? (
+                        p
+                      ) : (
+                        <Link key={j} to={p.to}>
+                          {p.text}
+                        </Link>
+                      ),
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 }
+
+// ── Closing ─────────────────────────────────────────────────────────────────
 
 function Closing() {
   const { releases } = useLiveReleases();

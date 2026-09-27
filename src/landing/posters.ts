@@ -44,7 +44,12 @@ export const POSTERS: readonly Poster[] = [
 const CDN = 'https://s4.anilist.co/file/anilistcdn/media';
 export const posterUrl = ([kind, file]: Poster) => `${CDN}/${kind}/cover/medium/${file}`;
 
-/** The wall's columns: every sixth poster, so neighbours never repeat. */
-export function posterColumns(count: number): Poster[][] {
-  return Array.from({ length: count }, (_, c) => POSTERS.filter((_, i) => i % count === c));
+/**
+ * The wall's columns. Wide screens show up to twelve, so covers repeat across columns, but
+ * each column steps through the list differently (stride 11, which shares no factor with 30),
+ * so no column repeats a cover and neighbouring columns never line up.
+ */
+export function posterColumns(count: number, perColumn = 6): Poster[][] {
+  const n = POSTERS.length;
+  return Array.from({ length: count }, (_, c) => Array.from({ length: perColumn }, (_, k) => POSTERS[(c * 7 + k * 11) % n]));
 }

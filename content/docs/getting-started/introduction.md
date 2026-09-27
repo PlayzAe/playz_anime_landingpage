@@ -14,7 +14,7 @@ It comes in two forms:
 - **The Windows app**, for Windows 10 and 11 (64-bit). It can download episodes and chapters and play them with no internet.
 - **The web app**, the same app in your browser. It streams and reads, but it can't download. See [PlayzAnime on the web](/docs/web-app/about-the-web-app).
 
-![The PlayzAnime home screen](/screenshots/home.png)
+![The PlayzAnime home screen](/screenshots/home.webp)
 
 ## Where things come from
 

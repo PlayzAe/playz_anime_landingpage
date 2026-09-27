@@ -11,6 +11,7 @@ const dir = join(root, 'public', 'screenshots');
 function findFfmpeg() {
   const candidates = [
     process.env.FFMPEG,
+    resolve(root, '..', 'playz_anime_desktopapp', 'node_modules', 'ffmpeg-static', 'ffmpeg.exe'),
     resolve(root, '..', 'Electron Conversion', 'node_modules', 'ffmpeg-static', 'ffmpeg.exe'),
     'ffmpeg',
   ].filter(Boolean);
