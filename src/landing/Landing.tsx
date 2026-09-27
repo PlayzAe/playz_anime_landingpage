@@ -92,14 +92,16 @@ export function Landing() {
 
 // ── Hero ────────────────────────────────────────────────────────────────────
 
-const WALL_COLUMNS = 12;
-const WALL_SPEEDS = [66, 84, 58, 92, 72, 78, 62, 88, 70, 80, 60, 86];
+const WALL_COLUMNS = 14;
+const WALL_SPEEDS = [66, 84, 58, 92, 72, 78, 62, 88, 70, 80, 60, 86, 74, 64];
+/** Phones show this many columns; the covers in the rest load only where those columns show. */
+const PHONE_COLUMNS = 6;
 
 /**
  * A wall of covers drifting behind the hero, tilted back and faded into the page, edge to
- * edge on any screen: wide screens show more columns, phones fewer (hidden columns never
- * download their covers). The motion is CSS transforms only, run by the compositor, it
- * stops while the wall is off screen, and reduced-motion users get a still wall.
+ * edge on any screen: wide screens show more columns, phones fewer. The motion is CSS
+ * transforms only, run by the compositor; it stops while the wall is off screen, and
+ * reduced-motion users get a still wall.
  */
 function PosterWall() {
   const ref = useRef<HTMLDivElement>(null);
@@ -125,7 +127,8 @@ function PosterWall() {
             <div className="wall-track">
               {[...col, ...col].map((p, i) => (
                 <span key={i} className="wall-tile" style={{ backgroundColor: p[2] }}>
-                  <img src={posterUrl(p)} alt="" width={230} height={326} loading="lazy" decoding="async" fetchPriority="low" />
+                  {/* Loaded up front, so no tile ever shows up empty as the columns move. */}
+                  <img src={posterUrl(p)} alt="" width={230} height={326} loading={c < PHONE_COLUMNS ? 'eager' : 'lazy'} decoding="async" fetchPriority="low" />
                 </span>
               ))}
             </div>

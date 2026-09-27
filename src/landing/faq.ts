@@ -21,7 +21,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'A title has no chapters or won’t play. What now?',
-    a: 'Sources come and go. Try another source from the chapter list, or the embed player for episodes. The [docs](/docs) have a troubleshooting section.',
+    a: 'Sources come and go. Try another source from the chapter list, or the embed player for episodes. See [a stream won’t load](/docs/troubleshooting/stream-wont-load) and [no chapters found](/docs/troubleshooting/no-chapters-found).',
   },
   {
     q: 'I own content that appears in PlayzAnime.',

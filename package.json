@@ -6,12 +6,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/fetch-releases.mjs && tsc -p tsconfig.json --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir .ssr && node scripts/prerender.mjs",
+    "build": "node scripts/fetch-releases.mjs && node scripts/check-links.mjs && tsc -p tsconfig.json --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir .ssr && node scripts/prerender.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "images": "node scripts/images.mjs",
     "shots": "node scripts/shots.mjs",
-    "releases": "node scripts/fetch-releases.mjs"
+    "releases": "node scripts/fetch-releases.mjs",
+    "check-links": "node scripts/check-links.mjs"
   },
   "license": "UNLICENSED",
   "dependencies": {
