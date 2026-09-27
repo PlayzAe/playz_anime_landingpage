@@ -47,6 +47,17 @@ Built with **React 19**, **Motion**, and **Vite**, it compiles to a blazing-fast
 
 ---
 
+## Screenshots
+
+<p align="center"><img src=".github/readme/site-home.png" alt="The PlayzAnime website" width="100%"/></p>
+
+<table>
+  <tr>
+    <td width="50%"><img src=".github/readme/docs-home.png" alt="Docs home"/><br/><sub>The docs: guides, changelog and policies</sub></td>
+    <td width="50%"><img src=".github/readme/docs-changelog.png" alt="Changelog"/><br/><sub>The changelog, written as GitHub Releases</sub></td>
+  </tr>
+</table>
+
 ## Features
 
 - **Interactive Showcases:** High-fidelity animated product previews highlighting the native desktop app and streaming web app.
