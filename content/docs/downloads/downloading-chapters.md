@@ -14,9 +14,22 @@ order: 2
 
 | Option | What it downloads |
 |---|---|
+| **From chapter N on** | Where you're reading, to the latest (shown when you've started the series) |
 | **Unread** | Every chapter you haven't read |
-| **Next 10 unread** | Your next 10 unread chapters |
+| **A range** | Chapter X to chapter Y. **Next 10**, **Next 50** and **Next 100** fill in the end for you |
 | **All** | Every chapter in the list |
+
+The dialog shows how many chapters that is before you start. How many download at the same time is set on the **Downloads** page (**At once**) or in **Settings**, **Downloads**.
+
+## Pause, resume and cancel
+
+Big batches are grouped on the **Downloads** page as one card per series, with how many are done, waiting and paused.
+
+- **Pause** on a series card (or **Pause all** at the top) stops downloading and keeps what's saved. **Resume** carries on.
+- **Cancel** stops and deletes the unfinished chapters of that series. **Cancel all** does it for everything unfinished. Finished chapters stay.
+- Open a card to pause, resume or cancel single chapters.
+
+Downloads left unfinished when you close PlayzAnime come back paused: press **Resume all** to carry on.
 
 Chapters come from the source currently shown in the chapter list. To download from a different source, switch the **Source** first. See [Sources and auto-pick](/docs/reading/sources-and-auto-pick).
 
