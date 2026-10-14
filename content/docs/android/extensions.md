@@ -1,27 +1,36 @@
 ---
-title: Mihon extensions
-description: Install, update and remove Mihon extensions, keep reading when a source disappears, and how adult content is handled.
+title: Extensions
+description: Optional extra manga sources on Android, how I load them, how updates and adult content work, and where they still break.
 section: Android
 order: 2
-badge: New
 ---
 
-# Mihon extensions
+# Extensions
 
-On Android, PlayzAnime runs real [Mihon](https://mihon.app) extensions from the keiyoushi repo: more than 1,400 manga, manhwa and manhua sites. They work the same way they do in Mihon. Nothing is installed as a separate app.
+Manga, manhwa and manhua work in PlayzAnime without installing anything: the built-in sources cover most titles. Extensions are optional, for when you want more sites.
+
+![Your manga sources](/screenshots/mobile/browse.webp "phone")
+![Extensions you can add](/screenshots/mobile/installed.webp "phone")
+![Browsing one extension source](/screenshots/mobile/extension.webp "phone")
+
+## Where they come from
+
+I took inspiration from how [Mihon](https://mihon.app) handles extensions, and PlayzAnime can load the ones published in the [keiyoushi repo](https://github.com/keiyoushi/extensions). They weren't made for PlayzAnime, so I wrote a small Android layer that loads them next to my Flutter app. Nothing is installed as a separate app.
+
+> **It's still buggy.** Flutter and Dart can't run these extensions on their own, so everything goes through that Android layer. Most sources work, but some fail to load, time out or need a retry. If you find one that breaks, please [open an issue](https://github.com/PlayzAe/playz_anime_app/issues) or, even better, a [pull request](https://github.com/PlayzAe/playz_anime_app/pulls). I'd love the help.
 
 ## Getting started
 
-The first time you open **Manga**, PlayzAnime offers ten popular English extensions (Asura Scans, Weeb Central, MangaFire, Manganato and others). Keep the ones you want and tap **Install**.
+The first time you open **Manga**, I offer you ten popular English extensions (Asura Scans, Weeb Central, MangaFire, Manganato and others). Keep the ones you want and tap **Install**, or skip it.
 
-You can install more any time in **Settings → Manga → Extensions**:
+You can add more any time in **Settings → Manga → Extensions**:
 
 - **Install** one, or **Install all** in the list you're looking at.
 - **Remove** takes an extension off again.
 - Filter by language, or search by name.
-- The globe button adds another repo (any Mihon `index.json`).
+- The globe button adds another repo that uses the same `index.json` format.
 
-Installed extensions only load when you use them, so having a hundred installed doesn't slow the app down.
+Installed extensions only load when you use them, so having a lot installed doesn't slow the app down.
 
 ## Updates
 

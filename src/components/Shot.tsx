@@ -71,11 +71,20 @@ export function Shot({ name, alt, sizes = '(max-width: 800px) 94vw, 720px', prio
 // ── Click to enlarge ────────────────────────────────────────────────────────
 
 export interface ShotItem {
-  name: ShotName;
+  /** A ShotName, or any unique id when `src` points somewhere else. */
+  name: string;
   alt: string;
+  /** A picture outside the desktop set, e.g. a phone screen, with its size. */
+  src?: string;
+  size?: [number, number];
+  /** Draws the enlarged view in a phone bezel. */
+  phone?: boolean;
 }
 
 const OpenShot = createContext<(item: ShotItem, group?: ShotItem[]) => void>(() => {});
+
+/** Opens the larger view from any element, not only a <ZoomShot>. */
+export const useShotViewer = () => useContext(OpenShot);
 
 /**
  * Lets any <ZoomShot> open a larger view. The picture grows out of where it was clicked
@@ -110,6 +119,7 @@ export function ShotViewerProvider({ children }: { children: ReactNode }) {
   }, [state, close, step]);
 
   const item = state ? state.group[state.index] : null;
+  const [w, h] = item ? (item.size ?? SIZES[item.name as ShotName]) : [0, 0];
   return (
     <OpenShot.Provider value={open}>
       {children}
@@ -130,11 +140,11 @@ export function ShotViewerProvider({ children }: { children: ReactNode }) {
             <motion.figure
               key={item.name}
               layoutId={`shot-${item.name}`}
-              className="viewer-figure"
+              className={`viewer-figure${item.phone ? ' is-phone' : ''}`}
               onClick={(e) => e.stopPropagation()}
               transition={{ type: 'spring', stiffness: 300, damping: 32 }}
             >
-              <img src={src(item.name)} alt={item.alt} width={SIZES[item.name][0]} height={SIZES[item.name][1]} />
+              <img src={item.src ?? src(item.name as ShotName)} alt={item.alt} width={w} height={h} />
             </motion.figure>
             <motion.p className="viewer-caption" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
               {item.alt}
@@ -165,7 +175,7 @@ export function ShotViewerProvider({ children }: { children: ReactNode }) {
 }
 
 /** A screenshot you can click to see bigger. */
-export function ZoomShot({ name, alt, group, sizes, priority }: ShotItem & { group?: ShotItem[]; sizes?: string; priority?: boolean }) {
+export function ZoomShot({ name, alt, group, sizes, priority }: { name: ShotName; alt: string; group?: ShotItem[]; sizes?: string; priority?: boolean }) {
   const open = useContext(OpenShot);
   return (
     <button type="button" className="zoom" onClick={() => open({ name, alt }, group)} aria-label={`${alt}. Show larger`}>

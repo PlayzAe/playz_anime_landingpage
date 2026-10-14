@@ -10,6 +10,8 @@ badge: New
 
 PlayzAnime for Android runs on Android 7 and newer, on phones, tablets and foldables. There is one APK for every device (the "universal" build), about 64 MB.
 
+> **Right now the Android app is my most up-to-date version.** It gets new features first and handles extensions reasonably well, but it still has issues. I'm looking for people to help me with it: if something breaks, please [open an issue](https://github.com/PlayzAe/playz_anime_app/issues) or a [pull request](https://github.com/PlayzAe/playz_anime_app/pulls).
+
 ## Download
 
 1. Open the [latest release](https://github.com/PlayzAe/playz_anime_app/releases/latest) on your phone.
@@ -27,6 +29,9 @@ Play Protect may say it doesn't recognise the app. That's because it isn't from 
 ## First launch
 
 A short setup runs once:
+
+![Setup: your name and accent colour](/screenshots/mobile/setup.webp "phone")
+![Setup: permissions, asked one at a time](/screenshots/mobile/permissions.webp "phone")
 
 - **Your name and colour.** The accent you pick colours the app, the logo and the home-screen icon.
 - **Permissions.** *Files* lets downloads go to any folder you pick; *Notifications* shows download progress and the play/pause controls. Android asks you directly, and you can change both later in **Settings → Permissions**.

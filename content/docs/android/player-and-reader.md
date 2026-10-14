@@ -11,6 +11,11 @@ order: 3
 
 Tap an episode and the phone turns to fullscreen by itself. The exit button (bottom right) brings you back to the episode list in portrait. Switch auto-rotate off in **Settings → Watching** if you prefer to start in portrait.
 
+![The player in landscape, with subtitles and the 5-second skip buttons](/screenshots/mobile/player.webp)
+
+![A show's page: the player on top, episodes below](/screenshots/mobile/watch.webp "phone")
+![Every episode of a show](/screenshots/mobile/anime-series.webp "phone")
+
 | Gesture | What it does |
 | --- | --- |
 | Tap | Show or hide the controls |
@@ -39,6 +44,9 @@ If a title isn't on the streaming source at all, PlayzAnime says **Not on the so
 ## Reading
 
 The settings button in the reader opens the reading modes:
+
+![The reading modes in the reader settings](/screenshots/mobile/reader-modes.webp "phone")
+![Reading a chapter page by page](/screenshots/mobile/reader.webp "phone")
 
 - **Paged (left to right)** and **Paged (right to left)**: tap the edges or swipe. Right-to-left puts page 1 on the right, like a printed manga.
 - **Paged (vertical)**: swipe up for the next page.

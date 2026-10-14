@@ -17,6 +17,8 @@ Tap the download icon on an episode, or hold one episode and tap others to selec
 - **Subtitles**: English, all languages, or none. Your subtitle style is used when you watch the download in PlayzAnime.
 - **Saving to**: your anime folder, which you can change right there.
 
+![The download sheet: range, audio, quality and subtitles](/screenshots/mobile/download.webp "phone")
+
 For manga, the chapter list's **Download…** offers the next ten, everything unread, or all chapters. Chapters from extensions download through the extension.
 
 ## While it downloads
@@ -27,9 +29,14 @@ For manga, the chapter list's **Download…** offers the next ten, everything un
 - If the connection drops, downloads wait and carry on when it comes back. Stream links that expire mid-download are renewed automatically.
 - Closing the app or restarting the phone doesn't lose anything: unfinished downloads pick up where they stopped next time you open PlayzAnime.
 
+![Download progress in the notification shade](/screenshots/mobile/notifications.webp "phone")
+![Downloads in progress, with pause and resume](/screenshots/mobile/downloads.webp "phone")
+
 ## The Downloads page
 
 Everything on your phone, grouped by show, filtered *Everything*, *Anime*, *Manga*, *Manhwa* or *Manhua*. Tap a cover to play an episode, read a chapter or delete them.
+
+![Finished downloads, saved on the phone](/screenshots/mobile/downloads-done.webp "phone")
 
 ## Offline
 

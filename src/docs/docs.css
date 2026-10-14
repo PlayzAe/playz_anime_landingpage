@@ -900,6 +900,22 @@
   border-radius: var(--radius-3);
   border: 1px solid var(--line);
 }
+/* Phone screenshots: a bezel, side by side in one row that shrinks to fit. */
+.prose p:has(> img.doc-phone) {
+  display: flex;
+  justify-content: center;
+  gap: clamp(8px, 2.4vw, 18px);
+  margin-block: 1.6em;
+}
+.prose img.doc-phone {
+  flex: 0 1 210px;
+  min-width: 0;
+  padding: 5px;
+  border: 0;
+  border-radius: 26px;
+  background: linear-gradient(160deg, #2b2825, #121110 60%);
+  box-shadow: 0 0 0 1px var(--line-2), 0 18px 40px -18px rgb(0 0 0 / 0.7);
+}
 .prose code {
   font-family: var(--font-mono);
   font-size: 0.88em;

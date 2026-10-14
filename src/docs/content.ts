@@ -145,6 +145,8 @@ const marked = new Marked({
     // Pictures live in /public, so they need the site's base path (GitHub Pages serves it under /<repo>/).
     image({ href: src, title, text }: Tokens.Image) {
       const url = /^[a-z]+:|^\/\//i.test(src) ? src : asset(src);
+      // A title of "phone" draws the picture in a phone bezel; several in one paragraph sit side by side.
+      if (title === 'phone') return `<img class="doc-phone" src="${url}" alt="${text}" loading="lazy" decoding="async" />`;
       const t = title ? ` title="${title}"` : '';
       return `<img src="${url}" alt="${text}"${t} loading="lazy" decoding="async" />`;
     },

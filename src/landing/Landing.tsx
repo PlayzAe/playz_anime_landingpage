@@ -2,9 +2,9 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Icon, type IconName } from '../components/Icon';
 import { Logo } from '../components/Logo';
-import { Frame, ShotViewerProvider, ZoomShot, type ShotItem, type ShotName } from '../components/Shot';
+import { Frame, ShotViewerProvider, useShotViewer, ZoomShot, type ShotItem, type ShotName } from '../components/Shot';
 import { formatSize, releasePath, useLiveReleases, type Release } from '../docs/changelog';
-import { DOWNLOAD_URL, GITHUB_URL, WEB_APP_URL } from '../lib/links';
+import { DOWNLOAD_URL, GITHUB_URL, REPO_URL, WEB_APP_URL } from '../lib/links';
 import { asset, Link } from '../lib/router';
 import { EASE, Reveal, Vertical } from './bits';
 import { FAQ, faqParts } from './faq';
@@ -256,33 +256,60 @@ function Showcase() {
 const PHONES: { src: string; alt: string; caption: string }[] = [
   { src: 'manga', alt: 'Manga home on Android: trending manhwa', caption: 'Manga, manhwa, manhua' },
   { src: 'watch', alt: 'Watching on Android with the episode list below the player', caption: 'Watch, with the episode list' },
-  { src: 'extension', alt: 'A Mihon extension browsing on Android', caption: 'Mihon extensions' },
   { src: 'reader-modes', alt: 'Reading modes: paged in any direction or long strip', caption: 'Five reading modes' },
   { src: 'download', alt: 'Download sheet: episode range, quality, subtitles', caption: 'Pick range and quality' },
+  { src: 'downloads', alt: 'Downloads in progress, grouped by show', caption: 'Downloads, with pause and resume' },
 ];
 
 const MOBILE_POINTS: { icon: IconName; title: string; body: string }[] = [
-  { icon: 'grid', title: 'Mihon extensions, for real', body: 'Install any of 1,400+ keiyoushi extensions in one tap and they run as they do in Mihon. Updates arrive on their own.' },
   { icon: 'play', title: 'A player made for thumbs', body: 'Opens in fullscreen. Double-tap to skip 5 s, swipe for brightness and volume, hold for 2×, picture-in-picture.' },
   { icon: 'downloads', title: 'Downloads that report back', body: 'Choose episodes, quality, audio and subtitles first. Progress sits in your notifications and survives a restart.' },
   { icon: 'manga', title: 'Read your way', body: 'Paged left-to-right or right-to-left, vertical pages, or a long strip with an adjustable width.' },
   { icon: 'palette', title: 'Your colour, even on the icon', body: 'Pick an accent and the logo, the app and the home-screen icon all change with it.' },
   { icon: 'offline', title: 'Works offline', body: 'No signal? PlayzAnime opens on your downloads. Back up your list and settings to one small file.' },
+  {
+    icon: 'grid',
+    title: 'More sources, if you want them',
+    body: 'Manga works out of the box. For extra sites I borrowed Mihon’s way of handling extensions, so the keiyoushi ones load too. It’s still rough in places.',
+  },
 ];
 
-/** Every other phone screen, in a strip under the fan. Tap one to open it full size. */
+/** Every other phone screen, in a strip under the fan. */
 const PHONE_GALLERY: { src: string; caption: string }[] = [
   { src: 'anime-series', caption: 'Every show, every episode' },
-  { src: 'series', caption: 'Manga details from an extension' },
+  { src: 'series', caption: 'Manga details and chapters' },
   { src: 'reader', caption: 'Reading, page by page' },
-  { src: 'downloads', caption: 'Downloads in progress' },
   { src: 'downloads-done', caption: 'Saved on this phone' },
   { src: 'notifications', caption: 'Progress in your notifications' },
-  { src: 'installed', caption: 'Extensions, one tap each' },
-  { src: 'browse', caption: 'All your sources' },
   { src: 'setup', caption: 'Pick your colour' },
   { src: 'permissions', caption: 'Permissions, asked properly' },
+  { src: 'browse', caption: 'Your manga sources' },
+  { src: 'installed', caption: 'Optional extension sources' },
+  { src: 'extension', caption: 'Browsing an extension source' },
 ];
+
+const phoneItem = (src: string, alt: string): ShotItem => ({ name: `m-${src}`, alt, src: asset(`/screenshots/mobile/${src}.webp`), size: [480, 1040], phone: true });
+
+/** Every phone screen on the page, in order, so the arrow keys step through all of them. */
+const PHONE_TOUR: ShotItem[] = [
+  ...PHONES.map((p) => phoneItem(p.src, p.alt)),
+  { name: 'm-player', alt: 'The Android player in landscape, with subtitles and 5-second skip', src: asset('/screenshots/mobile/player.webp'), size: [960, 432], phone: true },
+  ...PHONE_GALLERY.map((g) => phoneItem(g.src, g.caption)),
+];
+const tourItem = (src: string) => PHONE_TOUR.find((t) => t.name === `m-${src}`)!;
+
+/** A phone screen that opens the larger view, growing out of where it sits. */
+function PhoneScreen({ src, className = 'phone-body', width = 480, height = 1040 }: { src: string; className?: string; width?: number; height?: number }) {
+  const open = useShotViewer();
+  const item = tourItem(src);
+  return (
+    <button type="button" className="phone-zoom" onClick={() => open(item, PHONE_TOUR)} aria-label={`${item.alt}. Show larger`}>
+      <motion.span layoutId={`shot-${item.name}`} className={className}>
+        <img src={item.src} alt={item.alt} width={width} height={height} loading="lazy" decoding="async" />
+      </motion.span>
+    </button>
+  );
+}
 
 /** The Android app: a fan of phones, then what's different on a phone. */
 function Mobile() {
@@ -300,8 +327,8 @@ function Mobile() {
           The whole app, in your pocket.
         </h2>
         <p className="mobile-lede">
-          PlayzAnime for Android is the desktop app rebuilt for touch: the same accents and type, the same no-ads player, the same reader, plus
-          the Mihon extensions manga readers already know.
+          I rebuilt the desktop app for touch: the same accents and type, the same no-ads player, the same reader, and downloads that play
+          offline. It’s my newest build, so it gets new features first.
         </p>
         <div className="mobile-ctas">
           <a className="button is-primary is-shine" href={apk?.url ?? DOWNLOAD_URL} rel="noopener noreferrer">
@@ -324,36 +351,30 @@ function Mobile() {
         {PHONES.map((ph, i) => (
           <Reveal key={ph.src} className={`phone-slot is-${i}`} delay={0.07 * i} y={50}>
             <figure className="phone" role="listitem">
-              <div className="phone-body">
-                <img src={asset(`/screenshots/mobile/${ph.src}.webp`)} alt={ph.alt} width={480} height={1040} loading="lazy" decoding="async" />
-              </div>
+              <PhoneScreen src={ph.src} />
               <figcaption>{ph.caption}</figcaption>
             </figure>
           </Reveal>
         ))}
       </div>
 
+      <Reveal className="phone-wide" y={40}>
+        <PhoneScreen src="player" className="phone-landscape" width={960} height={432} />
+        <p>Tap an episode and the phone turns to fullscreen by itself. Exit returns you to the episode list.</p>
+      </Reveal>
+
       <Reveal className="phone-gallery-head">
         <h3 className="display">More from the phone</h3>
-        <p>Swipe through, tap any screen to see it full size.</p>
+        <p>Swipe through, tap any screen to see it bigger.</p>
       </Reveal>
       <div className="phone-gallery" role="list">
         {PHONE_GALLERY.map((g) => (
-          <a key={g.src} className="phone-mini" role="listitem" href={asset(`/screenshots/mobile/${g.src}.webp`)} target="_blank" rel="noopener noreferrer">
-            <div className="phone-body">
-              <img src={asset(`/screenshots/mobile/${g.src}.webp`)} alt={g.caption} width={480} height={1040} loading="lazy" decoding="async" />
-            </div>
+          <div key={g.src} className="phone-mini" role="listitem">
+            <PhoneScreen src={g.src} />
             <span>{g.caption}</span>
-          </a>
+          </div>
         ))}
       </div>
-
-      <Reveal className="phone-wide" y={40}>
-        <div className="phone-landscape">
-          <img src={asset('/screenshots/mobile/player.webp')} alt="The Android player in landscape, with subtitles and 5-second skip" width={960} height={432} loading="lazy" decoding="async" />
-        </div>
-        <p>Tap an episode and the phone turns to fullscreen by itself. Exit returns you to the episode list.</p>
-      </Reveal>
 
       <div className="mobile-grid">
         {MOBILE_POINTS.map((x, i) => (
@@ -366,6 +387,20 @@ function Mobile() {
           </Reveal>
         ))}
       </div>
+
+      <Reveal className="mobile-help">
+        <p>
+          <strong>It’s still young.</strong> Android is my most up-to-date build, but it has rough edges, especially with extensions. Found a bug?{' '}
+          <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer">
+            Open an issue
+          </a>{' '}
+          or send me a{' '}
+          <a href={`${REPO_URL}/pulls`} target="_blank" rel="noopener noreferrer">
+            pull request
+          </a>
+          . I’d love the help.
+        </p>
+      </Reveal>
     </section>
   );
 }
@@ -504,7 +539,7 @@ function Platforms() {
           icon="android"
           name="Android app"
           lede="The full app for phones and tablets. One APK, Android 7 and up."
-          items={['Everything on Windows, plus:', 'Mihon extensions', 'Gestures and picture-in-picture', 'Download notifications']}
+          items={['Everything on Windows, plus:', 'Gestures and picture-in-picture', 'Download notifications', 'Optional extension sources']}
           cta={
             <a className="button is-primary" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
               <Icon name="android" size={18} /> Download the APK
