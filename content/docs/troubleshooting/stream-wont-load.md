@@ -39,4 +39,4 @@ If nothing works for any episode, the host is probably down. It usually comes ba
 
 ## Still stuck?
 
-Open an issue on [GitHub](https://github.com/PlayzAe/playz_anime_desktopapp/issues) with the show, the episode and what you tried. A screenshot helps.
+Open an issue on [GitHub](https://github.com/PlayzAe/playz_anime_app/issues) with the show, the episode and what you tried. A screenshot helps.

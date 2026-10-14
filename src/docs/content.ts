@@ -7,7 +7,7 @@ import { asset, href } from '../lib/router';
  * They're bundled at build time, so the site stays fully static.
  */
 
-export const SECTIONS = ['Getting started', 'Watching', 'Reading', 'Downloads', 'Offline', 'Profiles', 'Settings', 'Web app', 'Troubleshooting', 'FAQ', 'Development', 'Policies'];
+export const SECTIONS = ['Getting started', 'Android', 'Watching', 'Reading', 'Downloads', 'Offline', 'Profiles', 'Settings', 'Web app', 'Troubleshooting', 'FAQ', 'Development', 'Policies'];
 
 export interface DocPage {
   /** e.g. "/docs/watching/the-player" */

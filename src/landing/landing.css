@@ -754,3 +754,221 @@
     justify-content: center;
   }
 }
+
+/* ── Android ─────────────────────────────────────────────────────────────── */
+
+.mobile {
+  position: relative;
+  padding-top: clamp(72px, 9vw, 128px);
+  padding-bottom: clamp(56px, 7vw, 96px);
+}
+.mobile-glow {
+  position: absolute;
+  inset: 8% -10% auto;
+  height: 620px;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 55% at 50% 60%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 70%),
+    radial-gradient(25% 35% at 15% 30%, color-mix(in oklab, var(--accent-hi) 10%, transparent), transparent 70%);
+  filter: blur(10px);
+  z-index: -1;
+}
+.mobile-head {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+.mobile-head .feature-eyebrow {
+  justify-content: center;
+}
+.mobile-lede {
+  margin-top: 16px;
+  font-size: clamp(16px, 1.6vw, 18.5px);
+  line-height: 1.6;
+  color: var(--paper-2);
+}
+.mobile-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+.mobile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 18px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--paper-3);
+}
+
+/* A fan of phones: the middle one forward, the outer ones tipped back. */
+.phones {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: clamp(10px, 2vw, 26px);
+  margin-top: clamp(40px, 6vw, 72px);
+  perspective: 1400px;
+}
+.phone-slot {
+  flex: 0 1 230px;
+  min-width: 0;
+}
+.phone-slot.is-0 { --fan: translateY(46px) rotate(-7deg); }
+.phone-slot.is-1 { --fan: translateY(16px) rotate(-3deg); }
+.phone-slot.is-2 { --fan: translateY(-8px) scale(1.06); z-index: 2; position: relative; }
+.phone-slot.is-3 { --fan: translateY(16px) rotate(3deg); }
+.phone-slot.is-4 { --fan: translateY(46px) rotate(7deg); }
+.phone {
+  margin: 0;
+  transform: var(--fan, none);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.phone:hover {
+  transform: var(--fan, none) translateY(-10px);
+}
+.phone-body {
+  position: relative;
+  padding: 7px;
+  border-radius: 34px;
+  background: linear-gradient(160deg, #2b2825, #121110 60%);
+  box-shadow:
+    0 0 0 1px var(--line-2),
+    0 30px 60px -20px rgb(0 0 0 / 0.75),
+    0 10px 40px -12px var(--accent-glow);
+}
+.phone-body::before {
+  /* the punch-hole camera */
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: #050505;
+  box-shadow: 0 0 0 1.5px #1d1b19;
+  z-index: 1;
+}
+.phone-body img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 480 / 1040;
+  border-radius: 27px;
+  background: var(--ink-1);
+}
+.phone figcaption {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--paper-2);
+}
+
+.phone-wide {
+  max-width: 860px;
+  margin: clamp(72px, 8vw, 110px) auto 0;
+  text-align: center;
+}
+.phone-landscape {
+  padding: 7px;
+  border-radius: 30px;
+  background: linear-gradient(160deg, #2b2825, #121110 60%);
+  box-shadow: 0 0 0 1px var(--line-2), 0 30px 70px -24px rgb(0 0 0 / 0.8), 0 10px 50px -16px var(--accent-glow);
+}
+.phone-landscape img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 960 / 432;
+  border-radius: 24px;
+}
+.phone-wide p {
+  margin-top: 16px;
+  font-size: 14.5px;
+  color: var(--paper-2);
+}
+.mobile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(48px, 6vw, 72px);
+}
+
+@media (max-width: 900px) {
+  /* Phones scroll sideways instead of shrinking to stamps. */
+  .phones {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 10px var(--gutter) 30px;
+    margin-inline: calc(var(--gutter) * -1);
+    scrollbar-width: none;
+  }
+  .phones::-webkit-scrollbar { display: none; }
+  .phone-slot { flex: 0 0 62vw; max-width: 260px; scroll-snap-align: center; }
+  .phone-slot[class*='is-'] { --fan: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phone, .phone:hover { transition: none; transform: none; }
+}
+
+/* More phone screens: a sideways strip of small phones. */
+.phone-gallery-head {
+  margin-top: clamp(72px, 8vw, 110px);
+  text-align: center;
+}
+.phone-gallery-head h3 {
+  font-size: clamp(26px, 3vw, 36px);
+}
+.phone-gallery-head p {
+  margin-top: 6px;
+  font-size: 14.5px;
+  color: var(--paper-3);
+}
+.phone-gallery {
+  display: flex;
+  gap: 18px;
+  margin-top: 28px;
+  padding: 12px 4px 26px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-4) transparent;
+}
+.phone-mini {
+  flex: 0 0 176px;
+  scroll-snap-align: start;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.phone-mini:hover {
+  transform: translateY(-8px);
+}
+.phone-mini .phone-body {
+  border-radius: 26px;
+  padding: 5px;
+}
+.phone-mini .phone-body::before {
+  top: 11px;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+}
+.phone-mini .phone-body img {
+  border-radius: 21px;
+}
+.phone-mini span {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--paper-2);
+}

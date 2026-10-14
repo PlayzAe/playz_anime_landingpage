@@ -45,7 +45,7 @@ New files appear in the sidebar, search and prev/next links automatically. Secti
 
 ## The changelog (no code needed)
 
-The changelog at `/docs/changelog` is built from the GitHub Releases of `PlayzAe/playz_anime_desktopapp`.
+The changelog at `/docs/changelog` is built from the GitHub Releases of `PlayzAe/playz_anime_app`.
 
 1. On GitHub: **Releases → Draft a new release**, pick a tag (e.g. `v1.2.0`), write the notes in Markdown,
    attach the installer and portable `.exe`, and publish.

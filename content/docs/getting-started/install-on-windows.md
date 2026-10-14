@@ -9,6 +9,8 @@ order: 2
 
 PlayzAnime runs on Windows 10 and Windows 11, 64-bit. Downloads are linked from [github.com/PlayzAe](https://github.com/PlayzAe) until the project has its own download page.
 
+On a phone? See [Install on Android](/docs/android/install-on-android).
+
 ## Installer or portable?
 
 There are two files. Pick one.

@@ -7,7 +7,7 @@ import { summarise } from './content';
  * prerendered page, and visitors' browsers also ask GitHub for anything newer.
  */
 
-export const RELEASES_REPO = 'PlayzAe/playz_anime_desktopapp';
+export const RELEASES_REPO = 'PlayzAe/playz_anime_app';
 
 export interface ReleaseAsset {
   name: string;

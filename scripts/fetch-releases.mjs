@@ -8,7 +8,7 @@
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const REPO = process.env.RELEASES_REPO || 'PlayzAe/playz_anime_desktopapp';
+const REPO = process.env.RELEASES_REPO || 'PlayzAe/playz_anime_app';
 const out = resolve(import.meta.dirname, '..', 'src', 'generated', 'releases.json');
 
 const headers = { Accept: 'application/vnd.github+json', 'User-Agent': 'playzanime-site' };

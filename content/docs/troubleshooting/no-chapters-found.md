@@ -31,4 +31,4 @@ The **Built-in sources** list in **Settings**, **Sources** shows which answer ri
 
 ## Still stuck?
 
-Open an issue on [GitHub](https://github.com/PlayzAe/playz_anime_desktopapp/issues) with the series name and which sources you tried.
+Open an issue on [GitHub](https://github.com/PlayzAe/playz_anime_app/issues) with the series name and which sources you tried.

@@ -17,6 +17,7 @@ const SITE_REPO = 'PlayzAe/playz_anime_landingpage';
 
 const SECTION_ICON: Record<string, IconName> = {
   'Getting started': 'bolt',
+  Android: 'android',
   Watching: 'play',
   Reading: 'manga',
   Downloads: 'downloads',

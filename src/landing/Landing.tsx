@@ -5,7 +5,7 @@ import { Logo } from '../components/Logo';
 import { Frame, ShotViewerProvider, ZoomShot, type ShotItem, type ShotName } from '../components/Shot';
 import { formatSize, releasePath, useLiveReleases, type Release } from '../docs/changelog';
 import { DOWNLOAD_URL, GITHUB_URL, WEB_APP_URL } from '../lib/links';
-import { Link } from '../lib/router';
+import { asset, Link } from '../lib/router';
 import { EASE, Reveal, Vertical } from './bits';
 import { FAQ, faqParts } from './faq';
 import { posterColumns, posterUrl } from './posters';
@@ -30,12 +30,13 @@ const altOf = (name: ShotName) => TOUR.find((t) => t.name === name)?.alt ?? '';
 
 export function Landing() {
   useEffect(() => {
-    document.title = 'PlayzAnime: free anime & manga app for Windows, open source';
+    document.title = 'PlayzAnime: free anime & manga app for Windows and Android, open source';
   }, []);
   return (
     <ShotViewerProvider>
       <Hero />
       <Showcase />
+      <Mobile />
       <section id="features" className="features page" aria-label="Features">
         <Feature
           eyebrow="Watch"
@@ -142,12 +143,15 @@ function PosterWall() {
 
 /** The newest release's Windows installer, when the release has one attached. */
 const installerOf = (release: Release | undefined) => release?.assets.find((a) => /setup.*\.exe$/i.test(a.name));
+/** The newest release that carries an Android APK. */
+const apkOf = (releases: Release[]) => releases.map((r) => r.assets.find((a) => /\.apk$/i.test(a.name))).find(Boolean);
 
 function Hero() {
   const reduced = useReducedMotion();
   const { releases } = useLiveReleases();
   const latest = releases[0];
   const installer = installerOf(latest);
+  const apk = apkOf(releases);
 
   return (
     <section className="hero" aria-labelledby="hero-title">
@@ -201,9 +205,9 @@ function Hero() {
             <Icon name="windows" size={18} />
             Download for Windows
           </a>
-          <a className="button is-glass" href={WEB_APP_URL} target="_blank" rel="noopener noreferrer">
-            <Icon name="globe" size={18} />
-            Open the web app
+          <a className="button is-glass" href={apk?.url ?? DOWNLOAD_URL} rel="noopener noreferrer">
+            <Icon name="android" size={18} />
+            Get it for Android
           </a>
         </motion.div>
         <motion.div className="hero-meta" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.35, duration: 0.8 }}>
@@ -211,9 +215,13 @@ function Hero() {
             {latest && <span className="num">{latest.tag}</span>}
             {installer && <span className="num">{formatSize(installer.size)}</span>}
             <span>Windows 10 and 11</span>
+            <span>Android 7+</span>
           </p>
           <a href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
             Portable and older versions
+          </a>
+          <a href={WEB_APP_URL} target="_blank" rel="noopener noreferrer">
+            Or open the web app
           </a>
         </motion.div>
       </div>
@@ -238,6 +246,125 @@ function Showcase() {
           </Frame>
         </motion.div>
         <div className="showcase-shadow" aria-hidden="true" />
+      </div>
+    </section>
+  );
+}
+
+// ── Android ─────────────────────────────────────────────────────────────────
+
+const PHONES: { src: string; alt: string; caption: string }[] = [
+  { src: 'manga', alt: 'Manga home on Android: trending manhwa', caption: 'Manga, manhwa, manhua' },
+  { src: 'watch', alt: 'Watching on Android with the episode list below the player', caption: 'Watch, with the episode list' },
+  { src: 'extension', alt: 'A Mihon extension browsing on Android', caption: 'Mihon extensions' },
+  { src: 'reader-modes', alt: 'Reading modes: paged in any direction or long strip', caption: 'Five reading modes' },
+  { src: 'download', alt: 'Download sheet: episode range, quality, subtitles', caption: 'Pick range and quality' },
+];
+
+const MOBILE_POINTS: { icon: IconName; title: string; body: string }[] = [
+  { icon: 'grid', title: 'Mihon extensions, for real', body: 'Install any of 1,400+ keiyoushi extensions in one tap and they run as they do in Mihon. Updates arrive on their own.' },
+  { icon: 'play', title: 'A player made for thumbs', body: 'Opens in fullscreen. Double-tap to skip 5 s, swipe for brightness and volume, hold for 2×, picture-in-picture.' },
+  { icon: 'downloads', title: 'Downloads that report back', body: 'Choose episodes, quality, audio and subtitles first. Progress sits in your notifications and survives a restart.' },
+  { icon: 'manga', title: 'Read your way', body: 'Paged left-to-right or right-to-left, vertical pages, or a long strip with an adjustable width.' },
+  { icon: 'palette', title: 'Your colour, even on the icon', body: 'Pick an accent and the logo, the app and the home-screen icon all change with it.' },
+  { icon: 'offline', title: 'Works offline', body: 'No signal? PlayzAnime opens on your downloads. Back up your list and settings to one small file.' },
+];
+
+/** Every other phone screen, in a strip under the fan. Tap one to open it full size. */
+const PHONE_GALLERY: { src: string; caption: string }[] = [
+  { src: 'anime-series', caption: 'Every show, every episode' },
+  { src: 'series', caption: 'Manga details from an extension' },
+  { src: 'reader', caption: 'Reading, page by page' },
+  { src: 'downloads', caption: 'Downloads in progress' },
+  { src: 'downloads-done', caption: 'Saved on this phone' },
+  { src: 'notifications', caption: 'Progress in your notifications' },
+  { src: 'installed', caption: 'Extensions, one tap each' },
+  { src: 'browse', caption: 'All your sources' },
+  { src: 'setup', caption: 'Pick your colour' },
+  { src: 'permissions', caption: 'Permissions, asked properly' },
+];
+
+/** The Android app: a fan of phones, then what's different on a phone. */
+function Mobile() {
+  const { releases } = useLiveReleases();
+  const apk = apkOf(releases);
+  return (
+    <section id="android" className="mobile page" aria-labelledby="mobile-title">
+      <div className="mobile-glow" aria-hidden="true" />
+      <Reveal className="mobile-head">
+        <p className="feature-eyebrow">
+          Android
+          <span className="feature-tag">New</span>
+        </p>
+        <h2 id="mobile-title" className="section-title display">
+          The whole app, in your pocket.
+        </h2>
+        <p className="mobile-lede">
+          PlayzAnime for Android is the desktop app rebuilt for touch: the same accents and type, the same no-ads player, the same reader, plus
+          the Mihon extensions manga readers already know.
+        </p>
+        <div className="mobile-ctas">
+          <a className="button is-primary is-shine" href={apk?.url ?? DOWNLOAD_URL} rel="noopener noreferrer">
+            <Icon name="android" size={18} />
+            Download the APK
+          </a>
+          <Link to="/docs/android/install-on-android" className="button is-glass">
+            How to install
+            <Icon name="arrowRight" size={16} />
+          </Link>
+        </div>
+        <p className="mobile-meta">
+          <span>Android 7 or newer</span>
+          {apk && <span className="num">{formatSize(apk.size)}</span>}
+          <span>One APK for every phone</span>
+        </p>
+      </Reveal>
+
+      <div className="phones" role="list">
+        {PHONES.map((ph, i) => (
+          <Reveal key={ph.src} className={`phone-slot is-${i}`} delay={0.07 * i} y={50}>
+            <figure className="phone" role="listitem">
+              <div className="phone-body">
+                <img src={asset(`/screenshots/mobile/${ph.src}.webp`)} alt={ph.alt} width={480} height={1040} loading="lazy" decoding="async" />
+              </div>
+              <figcaption>{ph.caption}</figcaption>
+            </figure>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal className="phone-gallery-head">
+        <h3 className="display">More from the phone</h3>
+        <p>Swipe through, tap any screen to see it full size.</p>
+      </Reveal>
+      <div className="phone-gallery" role="list">
+        {PHONE_GALLERY.map((g) => (
+          <a key={g.src} className="phone-mini" role="listitem" href={asset(`/screenshots/mobile/${g.src}.webp`)} target="_blank" rel="noopener noreferrer">
+            <div className="phone-body">
+              <img src={asset(`/screenshots/mobile/${g.src}.webp`)} alt={g.caption} width={480} height={1040} loading="lazy" decoding="async" />
+            </div>
+            <span>{g.caption}</span>
+          </a>
+        ))}
+      </div>
+
+      <Reveal className="phone-wide" y={40}>
+        <div className="phone-landscape">
+          <img src={asset('/screenshots/mobile/player.webp')} alt="The Android player in landscape, with subtitles and 5-second skip" width={960} height={432} loading="lazy" decoding="async" />
+        </div>
+        <p>Tap an episode and the phone turns to fullscreen by itself. Exit returns you to the episode list.</p>
+      </Reveal>
+
+      <div className="mobile-grid">
+        {MOBILE_POINTS.map((x, i) => (
+          <Reveal key={x.title} className="extra" delay={0.05 * i}>
+            <span className="extra-icon">
+              <Icon name={x.icon} size={20} />
+            </span>
+            <h3>{x.title}</h3>
+            <p>{x.body}</p>
+          </Reveal>
+        ))}
       </div>
     </section>
   );
@@ -324,7 +451,7 @@ function Gallery() {
 const EXTRAS: { icon: IconName; title: string; body: string }[] = [
   { icon: 'shield', title: 'No ads, no trackers', body: 'No pop-ups, no analytics, no cookies. Not now, not later.' },
   { icon: 'keyboard', title: 'Keyboard first', body: 'Space, J, L, N, F and more. The reader turns pages with arrows.' },
-  { icon: 'offline', title: 'Offline mode', body: 'No internet? The Windows app opens on your downloads and plays them.' },
+  { icon: 'offline', title: 'Offline mode', body: 'No internet? The Windows and Android apps open on your downloads and play them.' },
   { icon: 'bolt', title: 'Data saver', body: 'Small buffers, capped quality and compressed pages for hotspots.' },
   { icon: 'profiles', title: 'Profiles, not accounts', body: 'Your lists stay on your device. Share them as a file if you like.' },
   { icon: 'github', title: 'Open source', body: 'Read the code, build it yourself, suggest a change.' },
@@ -358,7 +485,7 @@ function Platforms() {
     <section className="platforms page" aria-labelledby="platforms-title">
       <Reveal>
         <h2 id="platforms-title" className="section-title display">
-          Two ways in
+          Three ways in
         </h2>
       </Reveal>
       <div className="platform-cards">
@@ -370,6 +497,17 @@ function Platforms() {
           cta={
             <a className="button is-primary" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
               <Icon name="windows" size={18} /> Download for Windows
+            </a>
+          }
+        />
+        <PlatformCard
+          icon="android"
+          name="Android app"
+          lede="The full app for phones and tablets. One APK, Android 7 and up."
+          items={['Everything on Windows, plus:', 'Mihon extensions', 'Gestures and picture-in-picture', 'Download notifications']}
+          cta={
+            <a className="button is-primary" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer">
+              <Icon name="android" size={18} /> Download the APK
             </a>
           }
         />
@@ -465,6 +603,7 @@ function Faq() {
 function Closing() {
   const { releases } = useLiveReleases();
   const installer = installerOf(releases[0]);
+  const apk = apkOf(releases);
   return (
     <section className="closing" aria-labelledby="closing-title">
       <PosterWall />
@@ -474,10 +613,13 @@ function Closing() {
         <h2 id="closing-title" className="closing-title display">
           Press play.
         </h2>
-        <p>Free, ad-free, and yours in a minute.</p>
+        <p>The free anime and manga app for Windows and Android. No ads, yours in a minute.</p>
         <div className="hero-ctas">
           <a className="button is-primary is-shine" href={installer?.url ?? DOWNLOAD_URL} rel="noopener noreferrer">
             <Icon name="windows" size={18} /> Download for Windows
+          </a>
+          <a className="button is-primary" href={apk?.url ?? DOWNLOAD_URL} rel="noopener noreferrer">
+            <Icon name="android" size={18} /> Download for Android
           </a>
           <a className="button is-glass" href={WEB_APP_URL} target="_blank" rel="noopener noreferrer">
             <Icon name="globe" size={18} /> Open the web app
