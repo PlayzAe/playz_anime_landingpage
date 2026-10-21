@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://playzae.github.io/playz_anime_landingpage/">Website</a> |
-  <a href="https://playz-anime.onrender.com">Launch Web App</a> |
+  <a href="https://playz-anime-bo36.onrender.com">Launch Web App</a> |
   <a href="https://playzae.github.io/playz_anime_landingpage/docs">Documentation</a> |
   <a href="https://playzae.github.io/playz_anime_landingpage/docs/policies/dmca">Copyright</a>
 </p>
@@ -61,7 +61,7 @@ Built with **React 19**, **Motion**, and **Vite**, it compiles to a blazing-fast
 ## Features
 
 - **Interactive Showcases:** High-fidelity animated product previews highlighting the native desktop app and streaming web app.
-- **Direct Web App Launch:** One-click gateway linking to the live [PlayzAnime Web App](https://playz-anime.onrender.com).
+- **Direct Web App Launch:** One-click gateway linking to the live [PlayzAnime Web App](https://playz-anime-bo36.onrender.com).
 - **Comprehensive Documentation:** Full Markdown documentation engine with real-time client-side search.
 - **Legal Compliance Suite:** Built-in DMCA, Copyright, Privacy, and Terms of Service documents.
 - **Dynamic Theme Palette:** Interactive color accent switcher mirroring the native desktop application.
@@ -138,7 +138,7 @@ All product links (Web App, Downloads, GitHub) are centralized in [`src/lib/link
 ```ts
 export const GITHUB_URL = 'https://github.com/PlayzAe';
 export const DOWNLOAD_URL = 'https://github.com/PlayzAe/playz_anime_app/releases/tag/Playz_Anime';
-export const WEB_APP_URL = 'https://playz-anime.onrender.com';
+export const WEB_APP_URL = 'https://playz-anime-bo36.onrender.com';
 ```
 
 <br>

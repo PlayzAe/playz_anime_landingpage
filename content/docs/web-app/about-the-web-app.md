@@ -9,7 +9,7 @@ order: 1
 
 The web edition of PlayzAnime runs directly in modern browsers on desktop, tablet, and mobile. It provides the same sleek catalog, custom video player, and manga reader as the desktop client without installing any software.
 
-- **Official Web App URL:** [playz-anime.onrender.com](https://playz-anime.onrender.com)
+- **Official Web App URL:** [playz-anime-bo36.onrender.com](https://playz-anime-bo36.onrender.com)
 - **Status:** 24/7 Cloud Hosted (Render)
 
 > [!IMPORTANT]
